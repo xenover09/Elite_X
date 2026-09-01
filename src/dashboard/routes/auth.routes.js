@@ -30,7 +30,7 @@ router.get('/callback', (req, res, next) => {
         return res.redirect('/?error=session_error');
       }
       console.log(`[AUTH] Successfully logged in: ${user.username} (${user.id})`);
-      return res.redirect('/');
+      return res.redirect('/dashboard');
     });
   })(req, res, next);
 });

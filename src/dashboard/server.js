@@ -59,6 +59,11 @@ function startDashboard(client) {
     res.sendFile(path.join(publicPath, 'index.html'));
   });
 
+  // DASHBOARD ROUTE: Serve the dashboard SPA after auth
+  app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+
   // Serve static UI assets
   app.use(express.static(publicPath));
 
