@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Privacy Policy - Elite AI Bot" />
+  <title>Privacy Policy - Elite AI Bot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .legal-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+    }
+    .legal-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+    .legal-content h2 {
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .legal-content p, .legal-content ul, .legal-content li {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .legal-content ul {
+      padding-left: 20px;
+    }
+    .legal-header-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="legal-container">
+    <div class="legal-header-logo">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <rect width="56" height="56" rx="16" fill="url(#logo-grad)" />
+        <path d="M18 36V20l10 8-10 8zm10-8l10 8V20l-10 8z" fill="#fff" fill-opacity=".9"/>
+        <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="56" y2="56"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+      </svg>
+    </div>
+    <h1 class="legal-title">Privacy Policy</h1>
+    <div class="legal-content">
+      <p><strong>Last Updated:</strong> September 2026</p>
+      
+      <p>Your privacy is important to <strong>The Elite Circle</strong>. This Privacy Policy outlines how <strong>Elite AI Bot</strong> collects, processes, and protects your data when you interact with our Discord bot and dashboard.</p>
+
+      <h2>1. Information We Collect</h2>
+      <p>When interacting with Elite AI Bot, we may process the following types of information to provide our services:</p>
+      <ul>
+        <li><strong>Discord Identifiers:</strong> We temporarily process user IDs, guild (server) IDs, and channel IDs to route commands and enforce permissions.</li>
+        <li><strong>Message Content:</strong> For AI-related features, the text prompt provided to the bot is processed. We do not proactively read or log messages in channels unless the bot is specifically invoked or mentioned.</li>
+        <li><strong>Dashboard Authentication:</strong> For users accessing the dashboard, we use Discord OAuth2 to verify your identity and server management permissions.</li>
+      </ul>
+
+      <h2>2. How We Use the Data</h2>
+      <p>The information collected is used strictly to operate the bot and its dashboard. Specifically, we use it for:</p>
+      <ul>
+        <li>Executing moderation commands and configuring server settings.</li>
+        <li>Processing user queries through AI models.</li>
+        <li>Authenticating administrators in the web dashboard.</li>
+      </ul>
+
+      <h2>3. Third-Party Services</h2>
+      <p>To provide advanced functionality, Elite AI Bot integrates with third-party services. The information processed is subject to their respective privacy policies:</p>
+      <ul>
+        <li><strong>Discord API:</strong> The core platform we operate on. By using this bot, your data is also handled according to Discord's Privacy Policy.</li>
+        <li><strong>Groq API:</strong> Text prompts intended for the AI are securely transmitted to Groq APIs for generation. We do not send personally identifiable information (PII) beyond the prompt text.</li>
+      </ul>
+
+      <h2>4. Data Retention</h2>
+      <p>Elite AI Bot is designed to minimize data footprint. We do not permanently store message histories or user chat logs. Configuration data (such as server settings or toggle states) is kept only as long as the bot remains in your server. AI prompts are processed in-memory and discarded after a response is generated.</p>
+
+      <h2>5. Security</h2>
+      <p>We implement standard security measures, including HTTPS/TLS for the dashboard and secure bearer token authentication, to protect against unauthorized access or data alteration. However, no internet-based service can guarantee 100% security.</p>
+
+      <h2>6. User Rights</h2>
+      <p>You have the right to request the deletion of your server's data. If you wish to revoke the bot's access and clear associated configurations, you can kick the bot from your Discord server. If you need assistance with data removal, please contact The Elite Circle's support team.</p>
+
+      <h2>7. Policy Changes</h2>
+      <p>We may update our Privacy Policy periodically. Continued use of Elite AI Bot after any changes indicates your acknowledgment and acceptance of the revised terms.</p>
+
+      <div style="text-align: center; margin-top: 40px;">
+        <a href="/" class="btn btn-outline">Return to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -62,6 +62,14 @@ function startDashboard(client) {
   // Serve static UI assets
   app.use(express.static(publicPath));
 
+  app.get('/terms', (req, res) => {
+    res.sendFile(path.join(publicPath, 'terms.html'));
+  });
+
+  app.get('/privacy', (req, res) => {
+    res.sendFile(path.join(publicPath, 'privacy.html'));
+  });
+
   // Attach Routes
   app.use('/auth', authRoutes);
   app.use('/api/settings', settingsRoutes);
