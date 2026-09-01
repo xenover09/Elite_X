@@ -8,13 +8,17 @@ const router = express.Router();
  * GET /auth/discord
  * Initiates the Discord OAuth2 login flow.
  */
-router.get('/discord', passport.authenticate('discord'));
+router.get('/discord', (req, res, next) => {
+  console.log(`[DIAGNOSTICS] /auth/discord hit. Redirecting to Discord...`);
+  next();
+}, passport.authenticate('discord'));
 
 /**
  * GET /auth/callback
  * Discord redirect back to the app after authorization.
  */
 router.get('/callback', (req, res, next) => {
+  console.log(`[DIAGNOSTICS] /auth/callback hit with query:`, req.query);
   passport.authenticate('discord', (err, user, info) => {
     if (err) {
       console.error('[AUTH] Passport auth error:', err);

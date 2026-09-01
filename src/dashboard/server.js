@@ -38,6 +38,12 @@ function startDashboard(client) {
   app.use(cors());
   app.use(express.json());
   
+  // Diagnostic request logger
+  app.use((req, res, next) => {
+    console.log(`[DIAGNOSTICS] Incoming request: ${req.method} ${req.url}`);
+    next();
+  });
+  
   // Session Middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || 'elite_bot_secret_xyz_123',
@@ -87,6 +93,8 @@ function startDashboard(client) {
 
   // Start Listener
   app.listen(port, '0.0.0.0', () => {
+    console.log(`[DIAGNOSTICS] Express server started! Listening on 0.0.0.0:${port}`);
+    console.log(`[DIAGNOSTICS] process.env.PORT is: ${process.env.PORT}`);
     logger.info(`🚀 DASHBOARD ACTIVE: http://localhost:${port}`);
   }).on('error', (err) => {
     logger.error(`Dashboard server error: ${err.message}`);

@@ -17,10 +17,8 @@ const requiredEnvVars = [
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     logger.error(`[STARTUP ERROR] Missing environment variable: ${envVar}`);
-    // Only exit on critical bot variables
-    if (envVar === 'DISCORD_TOKEN') {
-       process.exit(1);
-    }
+    // We intentionally DO NOT exit here anymore so the dashboard stays online
+    // to allow the user to debug OAuth and fix the environment variable.
   }
 }
 
@@ -50,7 +48,8 @@ startDashboard(client);
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
   logger.error('❌ Failed to login to Discord. Check your DISCORD_TOKEN on Railway!');
   logger.error(`Error details: ${err.message}`);
-  process.exit(1);
+  logger.warn('⚠️ Bot is offline, but the dashboard server will remain active.');
+  // Removed process.exit(1) to prevent Railway 404 proxy errors during crash loops
 });
 
 // Global error handlers
