@@ -58,6 +58,6 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 process.on('uncaughtException', (err) => {
-  logger.error('Uncaught Exception:', err.message);
-  process.exit(1);
+  logger.error('Uncaught Exception:', err.stack || err.message);
+  logger.warn('⚠️ Caught exception but preventing process exit to keep dashboard online.');
 });

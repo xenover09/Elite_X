@@ -18,22 +18,27 @@ router.get('/discord', (req, res, next) => {
  * Discord redirect back to the app after authorization.
  */
 router.get('/callback', (req, res, next) => {
-  console.log(`[DIAGNOSTICS] /auth/callback hit with query:`, req.query);
+  console.log(`[DIAGNOSTICS] /auth/callback hit. Commencing passport authenticate...`);
+  
   passport.authenticate('discord', (err, user, info) => {
+    console.log(`[DIAGNOSTICS] passport.authenticate returned. err:`, !!err, `user:`, !!user);
+    
     if (err) {
-      console.error('[AUTH] Passport auth error:', err);
+      console.error('[AUTH] Passport auth error details:', err);
       return res.redirect('/?error=auth_error');
     }
     if (!user) {
       console.warn('[AUTH] No user found in callback:', info);
       return res.redirect('/?error=no_user');
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        console.error('[AUTH] Session login error:', err);
+    
+    console.log(`[DIAGNOSTICS] User fetched from Discord: ${user.username}. Initiating req.logIn...`);
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        console.error('[AUTH] Session login error details:', loginErr);
         return res.redirect('/?error=session_error');
       }
-      console.log(`[AUTH] Successfully logged in: ${user.username} (${user.id})`);
+      console.log(`[AUTH] Successfully logged in and session saved: ${user.username} (${user.id})`);
       return res.redirect('/dashboard');
     });
   })(req, res, next);

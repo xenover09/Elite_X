@@ -44,12 +44,15 @@ function startDashboard(client) {
     next();
   });
   
+  // Railway sits behind a proxy, so we must trust it for secure cookies if applicable
+  app.set('trust proxy', 1);
+
   // Session Middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || 'elite_bot_secret_xyz_123',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: false } // Set to true if using HTTPS strictly
   }));
 
   app.use(passport.initialize());
