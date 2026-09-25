@@ -41,26 +41,65 @@ async function queryGroq(question, guildState) {
   const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || 1024;
   const temperature = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
 
-  let completion;
+  const messages = [
+    {
+      role: 'system',
+      content:
+        'You are a helpful, concise, and friendly AI assistant inside a Discord server. ' +
+        'Keep responses clear and well-structured. Use markdown formatting where appropriate. ' +
+        'If a question is harmful, illegal, or inappropriate, politely decline to answer.',
+    },
+    {
+      role: 'user',
+      content: question,
+    },
+  ];
+
+  let text = '';
+
   try {
-    completion = await client.chat.completions.create({
-      model,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a helpful, concise, and friendly AI assistant inside a Discord server. ' +
-            'Keep responses clear and well-structured. Use markdown formatting where appropriate. ' +
-            'If a question is harmful, illegal, or inappropriate, politely decline to answer.',
+    if (guildState && (guildState.aiApiKey || guildState.aiApiUrl)) {
+      // Use raw fetch for custom API to guarantee OpenAI compatibility
+      let baseUrl = guildState.aiApiUrl || 'https://api.groq.com/openai/v1';
+      // Ensure no trailing slash before appending
+      if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+      
+      let apiKey = guildState.aiApiKey || process.env.GROQ_API_KEY;
+      if (apiKey) apiKey = apiKey.trim();
+
+      const response = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'x-goog-api-key': apiKey
         },
-        {
-          role: 'user',
-          content: question,
-        },
-      ],
-      max_tokens: maxTokens,
-      temperature,
-    });
+        body: JSON.stringify({
+          model,
+          messages,
+          max_tokens: maxTokens,
+          temperature
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errText}`);
+      }
+
+      const data = await response.json();
+      text = data?.choices?.[0]?.message?.content?.trim();
+    } else {
+      // Use default Groq SDK
+      const client = getGroqClient();
+      const completion = await client.chat.completions.create({
+        model,
+        messages,
+        max_tokens: maxTokens,
+        temperature,
+      });
+      text = completion?.choices?.[0]?.message?.content?.trim();
+    }
   } catch (err) {
     logger.error('Groq API request failed:', err.message);
 
@@ -69,9 +108,9 @@ async function queryGroq(question, guildState) {
     throw enriched;
   }
 
-  const text = completion?.choices?.[0]?.message?.content?.trim();
   if (!text) {
-    const err = new Error('Groq returned an empty response.');
+    logger.error('Empty response received from AI API.');
+    const err = new Error('API returned an empty response.');
     err.userMessage = 'The AI returned an empty response. Please try rephrasing your question.';
     throw err;
   }
