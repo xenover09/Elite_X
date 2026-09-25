@@ -33,7 +33,7 @@ async function queryGroq(question, guildState) {
     client = getGroqClient();
   }
 
-  let model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  let model = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
   if (guildState && guildState.aiModel) {
     model = guildState.aiModel.trim();
   }
