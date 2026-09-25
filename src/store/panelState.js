@@ -26,7 +26,8 @@ function getState(guildId) {
       autoMod: false,
       aiChannel: '',
       aiApiUrl: '',
-      aiApiKey: ''
+      aiApiKey: '',
+      aiModel: ''
     });
   }
   return state.get(guildId);
@@ -53,6 +54,7 @@ function updateAISettings(guildId, settings) {
   current.aiChannel = settings.aiChannel || '';
   current.aiApiUrl = settings.aiApiUrl || '';
   current.aiApiKey = settings.aiApiKey || '';
+  current.aiModel = settings.aiModel || '';
   state.set(guildId, current);
   return current;
 }

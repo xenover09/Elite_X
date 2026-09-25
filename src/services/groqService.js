@@ -33,7 +33,11 @@ async function queryGroq(question, guildState) {
     client = getGroqClient();
   }
 
-  const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  let model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  if (guildState && guildState.aiModel) {
+    model = guildState.aiModel;
+  }
+
   const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || 1024;
   const temperature = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
 

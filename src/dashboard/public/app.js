@@ -36,6 +36,7 @@
   const aiChannelSelect   = $('#ai-channel-select');
   const aiApiUrlInput     = $('#ai-api-url');
   const aiApiKeyInput     = $('#ai-api-key');
+  const aiModelInput      = $('#ai-model');
   const embedForm         = $('#embed-form');
   const addButtonRow      = $('#add-button-row');
   const buttonsContainer  = $('#buttons-container');
@@ -294,6 +295,7 @@
     if (aiChannelSelect) aiChannelSelect.value = data.aiChannel || '';
     if (aiApiUrlInput) aiApiUrlInput.value = data.aiApiUrl || '';
     if (aiApiKeyInput) aiApiKeyInput.value = data.aiApiKey || '';
+    if (aiModelInput) aiModelInput.value = data.aiModel || '';
   }
 
   function setAIState(enabled) {
@@ -322,7 +324,8 @@
         guildId: currentGuildId,
         aiChannel: aiChannelSelect.value,
         aiApiUrl: aiApiUrlInput.value,
-        aiApiKey: aiApiKeyInput.value
+        aiApiKey: aiApiKeyInput.value,
+        aiModel: aiModelInput.value
       };
 
       try {
