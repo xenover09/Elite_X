@@ -21,7 +21,13 @@ const state = new Map();
  */
 function getState(guildId) {
   if (!state.has(guildId)) {
-    state.set(guildId, { aiChat: true, autoMod: false });
+    state.set(guildId, { 
+      aiChat: true, 
+      autoMod: false,
+      aiChannel: '',
+      aiApiUrl: '',
+      aiApiKey: ''
+    });
   }
   return state.get(guildId);
 }
@@ -39,4 +45,16 @@ function toggleFeature(guildId, feature) {
   return current[feature];
 }
 
-module.exports = { getState, toggleFeature };
+/**
+ * Updates advanced AI settings for a guild.
+ */
+function updateAISettings(guildId, settings) {
+  const current = getState(guildId);
+  current.aiChannel = settings.aiChannel || '';
+  current.aiApiUrl = settings.aiApiUrl || '';
+  current.aiApiKey = settings.aiApiKey || '';
+  state.set(guildId, current);
+  return current;
+}
+
+module.exports = { getState, toggleFeature, updateAISettings };

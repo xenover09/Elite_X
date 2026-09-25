@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getSettings, toggleAI } = require('../../services/settingsService');
+const { getSettings, toggleAI, updateAISettings } = require('../../services/settingsService');
 const authMiddleware = require('../middleware/auth');
 
 /**
@@ -18,7 +18,20 @@ router.get('/', authMiddleware, (req, res) => {
  * Toggles the AI ON/OFF.
  */
 router.post('/toggle', authMiddleware, (req, res) => {
-  const result = toggleAI();
+  const { guildId } = req.body;
+  if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
+  const result = toggleAI(guildId);
+  res.json(result);
+});
+
+/**
+ * POST /api/settings/ai
+ * Updates Advanced AI settings (channel, api url, api key).
+ */
+router.post('/ai', authMiddleware, (req, res) => {
+  const { guildId, aiChannel, aiApiUrl, aiApiKey } = req.body;
+  if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
+  const result = updateAISettings(guildId, { aiChannel, aiApiUrl, aiApiKey });
   res.json(result);
 });
 

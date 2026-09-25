@@ -32,6 +32,10 @@
   const tabContents       = $$('.tab-content');
   const aiToggleBtn       = $('#ai-toggle-btn');
   const aiStatusLabel     = $('#ai-status-label');
+  const aiSettingsForm    = $('#ai-settings-form');
+  const aiChannelSelect   = $('#ai-channel-select');
+  const aiApiUrlInput     = $('#ai-api-url');
+  const aiApiKeyInput     = $('#ai-api-key');
   const embedForm         = $('#embed-form');
   const addButtonRow      = $('#add-button-row');
   const buttonsContainer  = $('#buttons-container');
@@ -246,7 +250,12 @@
       const channels = await api(`/api/settings/${guildId}/channels`);
       const dropdowns = $$('.channel-select');
       dropdowns.forEach(dd => {
-        dd.innerHTML = '<option value="" disabled selected>------- SELECT CHANNEL -------</option>';
+        const isOptional = dd.id === 'ai-channel-select';
+        if (isOptional) {
+          dd.innerHTML = '<option value="">------- ANY CHANNEL (OPTIONAL) -------</option>';
+        } else {
+          dd.innerHTML = '<option value="" disabled selected>------- SELECT CHANNEL -------</option>';
+        }
         channels.forEach(c => {
           const opt = document.createElement('option');
           opt.value = c.id;
@@ -282,6 +291,9 @@
     if (!currentGuildId) return;
     const data = await api(`/api/settings?guildId=${currentGuildId}`);
     setAIState(data.aiEnabled);
+    if (aiChannelSelect) aiChannelSelect.value = data.aiChannel || '';
+    if (aiApiUrlInput) aiApiUrlInput.value = data.aiApiUrl || '';
+    if (aiApiKeyInput) aiApiKeyInput.value = data.aiApiKey || '';
   }
 
   function setAIState(enabled) {
@@ -300,6 +312,30 @@
       toast('Toggle failed', 'error');
     }
   });
+
+  if (aiSettingsForm) {
+    aiSettingsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentGuildId) return toast('Select a server first', 'error');
+
+      const payload = {
+        guildId: currentGuildId,
+        aiChannel: aiChannelSelect.value,
+        aiApiUrl: aiApiUrlInput.value,
+        aiApiKey: aiApiKeyInput.value
+      };
+
+      try {
+        await api('/api/settings/ai', {
+          method: 'POST',
+          body: payload
+        });
+        toast('AI Settings saved successfully!', 'success');
+      } catch (e) {
+        toast(e.message || 'Failed to save AI settings', 'error');
+      }
+    });
+  }
 
   // ─── Panel Actions ───────────────────────────────────
 

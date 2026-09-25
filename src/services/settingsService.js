@@ -1,15 +1,19 @@
 'use strict';
 
-const { getState, toggleFeature } = require('../store/panelState');
+const { getState, toggleFeature, updateAISettings } = require('../store/panelState');
 
 /**
  * Returns dashboard-facing settings for a guild.
  * @param {string} guildId
- * @returns {{ aiEnabled: boolean }}
  */
 function getSettings(guildId) {
   const state = getState(guildId);
-  return { aiEnabled: state.aiChat };
+  return { 
+    aiEnabled: state.aiChat,
+    aiChannel: state.aiChannel,
+    aiApiUrl: state.aiApiUrl,
+    aiApiKey: state.aiApiKey
+  };
 }
 
 /**
@@ -22,4 +26,4 @@ function toggleAI(guildId) {
   return { aiEnabled: newValue };
 }
 
-module.exports = { getSettings, toggleAI };
+module.exports = { getSettings, toggleAI, updateAISettings };

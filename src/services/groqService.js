@@ -19,10 +19,19 @@ function getGroqClient() {
  * Throws an enriched error with a `userMessage` property on failure.
  *
  * @param {string} question - The user's question.
+ * @param {object} [guildState] - The settings for the guild.
  * @returns {Promise<string>} The AI's response text.
  */
-async function queryGroq(question) {
-  const client = getGroqClient();
+async function queryGroq(question, guildState) {
+  let client;
+  if (guildState && (guildState.aiApiKey || guildState.aiApiUrl)) {
+    client = new Groq({ 
+      apiKey: guildState.aiApiKey || process.env.GROQ_API_KEY,
+      baseURL: guildState.aiApiUrl || undefined
+    });
+  } else {
+    client = getGroqClient();
+  }
 
   const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
   const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || 1024;

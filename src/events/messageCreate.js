@@ -49,6 +49,16 @@ module.exports = {
       return;
     }
 
+    // 4.5. Check if AI is restricted to a specific channel
+    if (guildState.aiChannel && message.channel.id !== guildState.aiChannel) {
+      if (isMention) {
+        return message.channel.send(
+          `<@${message.author.id}> ⚠️ AI can only be used in <#${guildState.aiChannel}>.`
+        );
+      }
+      return;
+    }
+
     // 5. Cooldown check
     const now = Date.now();
     const lastUsed = cooldowns.get(message.author.id) || 0;
@@ -98,7 +108,7 @@ module.exports = {
     try {
       logger.info(`AI chat request from ${message.author.tag} in guild "${message.guild.name}": ${question.slice(0, 80)}...`);
 
-      const response = await queryGroq(question);
+      const response = await queryGroq(question, guildState);
 
       // Build chunks — first chunk gets the mention header, rest are plain continuations
       const chunks = splitMessage(response, 1800);
