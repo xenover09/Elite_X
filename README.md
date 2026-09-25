@@ -52,7 +52,7 @@ Whether you need to send dynamic embeds, manage channel privacy, or leverage AI 
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/xenoverhubofficial09-netizen/Elite-ai-bot.git
+   git clone https://github.com/xenover09/Elite_X.git
    cd Elite-ai-bot
    ```
 
@@ -97,7 +97,7 @@ Whether you need to send dynamic embeds, manage channel privacy, or leverage AI 
 
 ## Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/xenoverhubofficial09-netizen/Elite-ai-bot/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/xenover09/Elite_X/issues).
 
 ---
 
