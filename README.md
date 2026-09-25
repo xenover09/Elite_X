@@ -53,7 +53,7 @@ Whether you need to send dynamic embeds, manage channel privacy, or leverage AI 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/xenover09/Elite_X.git
-   cd Elite-ai-bot
+   cd Elite_X
    ```
 
 2. **Install dependencies:**
