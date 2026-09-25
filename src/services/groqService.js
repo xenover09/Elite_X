@@ -59,36 +59,59 @@ async function queryGroq(question, guildState) {
 
   try {
     if (guildState && (guildState.aiApiKey || guildState.aiApiUrl)) {
-      // Use raw fetch for custom API to guarantee OpenAI compatibility
-      let baseUrl = guildState.aiApiUrl || 'https://api.groq.com/openai/v1';
-      // Ensure no trailing slash before appending
-      if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
-      
       let apiKey = guildState.aiApiKey || process.env.GROQ_API_KEY;
       if (apiKey) apiKey = apiKey.trim();
 
-      const response = await fetch(`${baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'x-goog-api-key': apiKey
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-          max_tokens: maxTokens,
-          temperature
-        })
-      });
+      // --- AUTO DETECT GOOGLE GEMINI KEY ---
+      if (apiKey && apiKey.startsWith('AIzaSy')) {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: messages[0].content }]
+            },
+            contents: [{ parts: [{ text: question }] }]
+          })
+        });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errText}`);
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`Google API ${response.status}: ${errText}`);
+        }
+
+        const data = await response.json();
+        text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      } 
+      // --- CUSTOM OPENAI COMPATIBLE ENDPOINT ---
+      else {
+        let baseUrl = guildState.aiApiUrl || 'https://api.groq.com/openai/v1';
+        if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+        
+        const response = await fetch(`${baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'x-goog-api-key': apiKey
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            max_tokens: maxTokens,
+            temperature
+          })
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errText}`);
+        }
+
+        const data = await response.json();
+        text = data?.choices?.[0]?.message?.content?.trim();
       }
-
-      const data = await response.json();
-      text = data?.choices?.[0]?.message?.content?.trim();
     } else {
       // Use default Groq SDK
       const client = getGroqClient();
