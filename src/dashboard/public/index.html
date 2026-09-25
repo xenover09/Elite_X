@@ -20,10 +20,7 @@
       <div class="login-glow"></div>
       <div class="login-card">
         <div class="login-logo">
-          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-            <rect width="56" height="56" rx="16" fill="var(--accent)" />
-            <path d="M18 36V20l10 8-10 8zm10-8l10 8V20l-10 8z" fill="#fff" fill-opacity=".9"/>
-          </svg>
+          <img src="logo.jpg" alt="Elite X Logo" style="width: 56px; height: 56px; border-radius: 16px; object-fit: cover;" />
         </div>
         <h1 class="login-title">Elite X</h1>
         <p class="login-subtitle">Enter your Admin Key to manage the bot</p>
@@ -114,8 +111,8 @@
           <div class="server-selector-text">
             <div class="server-name-truncate" id="current-guild-name" style="cursor: pointer;" onclick="document.querySelector('.nav-item[data-tab=\'card-overview\']').click()">Select Server</div>
             <div class="server-change-text" style="position: relative;">
-              <span style="font-size: 0.75rem; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600;">Change Server <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
-              <select id="guild-select" class="guild-select-hidden">
+              <span style="font-size: 0.75rem; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600;" onclick="document.getElementById('nav-dashboard-btn').click()">Change Server</span>
+              <select id="guild-select" class="guild-select-hidden" style="display: none;">
                 <option value="" disabled selected>Change Server</option>
               </select>
             </div>

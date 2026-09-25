@@ -102,8 +102,8 @@
       
       // Fetch bot info for logo
       const healthObj = await api('/api/health');
-      if (healthObj && healthObj.avatar && topbarBotLogo) {
-        topbarBotLogo.src = healthObj.avatar;
+      if (topbarBotLogo) {
+        topbarBotLogo.src = 'logo.jpg';
         topbarBotLogo.style.display = 'block';
       }
 

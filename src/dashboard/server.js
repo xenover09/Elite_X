@@ -100,9 +100,11 @@ function startDashboard(client) {
 
   // Start Listener
   app.listen(port, '0.0.0.0', () => {
-    console.log(`[DIAGNOSTICS] Express server started! Listening on 0.0.0.0:${port}`);
-    console.log(`[DIAGNOSTICS] process.env.PORT is: ${process.env.PORT}`);
-    logger.info(`🚀 DASHBOARD ACTIVE: http://localhost:${port}`);
+    console.log(`\n======================================================`);
+    console.log(`🚀 BOT & DASHBOARD STARTED SUCCESSFULLY!`);
+    console.log(`👉 CLICK HERE TO OPEN: http://localhost:${port}`);
+    console.log(`======================================================\n`);
+    logger.info(`Dashboard running on http://localhost:${port}`);
   }).on('error', (err) => {
     logger.error(`Dashboard server error: ${err.message}`);
   });

@@ -70,6 +70,7 @@ router.get('/:guildId/channels', authMiddleware, (req, res) => {
 
   const channels = guild.channels.cache
     .filter(c => c.type === 0) // Text channels
+    .sort((a, b) => a.rawPosition - b.rawPosition)
     .map(c => ({ id: c.id, name: c.name }));
   res.json(channels);
 });
@@ -101,11 +102,13 @@ router.get('/:guildId/roles', authMiddleware, (req, res) => {
   const guild = client.guilds.cache.get(guildId);
   if (!guild) return res.status(404).json({ error: 'Guild not found' });
 
-  const roles = guild.roles.cache.map(r => ({
-    id: r.id,
-    name: r.name,
-    color: r.color
-  }));
+  const roles = guild.roles.cache
+    .sort((a, b) => b.position - a.position)
+    .map(r => ({
+      id: r.id,
+      name: r.name,
+      color: r.color
+    }));
   res.json(roles);
 });
 
