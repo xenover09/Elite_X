@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/G344lTz.png" alt="Elite X Logo" width="150" />
+  <img src="assets/logo.jpg" alt="Elite X Logo" width="150" />
   <h1>Elite X</h1>
   <p><strong>A Next-Generation Discord AI & Moderation Bot with a Powerful Web Dashboard</strong></p>
   
@@ -12,7 +12,7 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 **Elite X** is a feature-rich, high-performance Discord bot designed for modern communities. It combines lightning-fast AI conversational capabilities (powered by Groq) with an advanced, beautifully designed web dashboard for seamless server management.
 
@@ -20,26 +20,26 @@ Whether you need to send dynamic embeds, manage channel privacy, or leverage AI 
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🤖 Advanced AI Capabilities
+### Advanced AI Capabilities
 - **Intelligent Chat:** Engaging and context-aware conversational AI using the Groq API.
 - **Toggleable AI:** Server admins can easily enable or disable AI features per server via the dashboard.
 
-### 🌐 Professional Web Dashboard
+### Professional Web Dashboard
 - **Secure Authentication:** OAuth2 Discord login ensures only authorized users can manage their servers.
 - **Multi-Server Management:** Easily switch between different servers where you have admin permissions.
 - **Live Server Stats:** View member counts, text channels, and voice channels at a glance.
 - **Theming:** Beautiful, responsive UI with Dark and Light mode support.
 
-### 🛠️ Powerful Moderation & Utilities
+### Powerful Moderation & Utilities
 - **Channel Lock/Unlock:** Instantly restrict channel access to specific VIP or Admin roles with a single click.
 - **Advanced Embed Builder:** Create and send fully customized rich embeds (custom titles, descriptions, colors, images, and interactive buttons).
 - **Clear Chat (Clone Method):** Nuke and recreate a channel instantly to permanently clear message history without losing permissions.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -85,7 +85,7 @@ Whether you need to send dynamic embeds, manage channel privacy, or leverage AI 
 
 ---
 
-## 📸 Dashboard Preview
+## Dashboard Preview
 
 *The dashboard provides an intuitive, module-based approach to managing your servers.*
 
@@ -95,17 +95,17 @@ Whether you need to send dynamic embeds, manage channel privacy, or leverage AI 
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/xenoverhubofficial09-netizen/Elite-ai-bot/issues).
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 <div align="center">
-  <i>Developed with ❤️ by The Elite Circle</i>
+  <i>Developed by Xenover</i>
 </div>
