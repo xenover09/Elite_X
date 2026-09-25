@@ -349,21 +349,12 @@
               </div>
               
               <div class="form-group mt-15">
-                <label>Custom API Provider URL (Optional):</label>
-                <input type="text" id="ai-api-url" placeholder="e.g. https://api.openai.com/v1">
-                <small class="text-muted">Leave blank to use default Groq AI.</small>
-              </div>
-              
-              <div class="form-group mt-15">
-                <label>Custom Model Name (Optional):</label>
-                <input type="text" id="ai-model" placeholder="e.g. gemini-1.5-flash">
-                <small class="text-muted">Required if using a custom provider that needs a specific model name.</small>
-              </div>
-              
-              <div class="form-group mt-15">
-                <label>Custom API Key (Optional):</label>
-                <input type="password" id="ai-api-key" placeholder="sk-...">
-                <small class="text-muted">Provide your own key if using a custom provider.</small>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                  <label style="margin-bottom: 0;">Groq API Key (Optional):</label>
+                  <a href="https://console.groq.com/" target="_blank" style="color: var(--accent); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Get API Key &nearr;</a>
+                </div>
+                <input type="password" id="ai-api-key" placeholder="gsk_...">
+                <small class="text-muted">Provide your own key to override the default bot API key.</small>
               </div>
               
               <button type="submit" class="btn btn-primary mt-20">Save AI Settings</button>

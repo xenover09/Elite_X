@@ -322,10 +322,10 @@
 
       const payload = {
         guildId: currentGuildId,
-        aiChannel: aiChannelSelect.value,
-        aiApiUrl: aiApiUrlInput.value,
-        aiApiKey: aiApiKeyInput.value,
-        aiModel: aiModelInput.value
+        aiChannel: aiChannelSelect ? aiChannelSelect.value : '',
+        aiApiUrl: aiApiUrlInput ? aiApiUrlInput.value : '',
+        aiApiKey: aiApiKeyInput ? aiApiKeyInput.value : '',
+        aiModel: aiModelInput ? aiModelInput.value : ''
       };
 
       try {
