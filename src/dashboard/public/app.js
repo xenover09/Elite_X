@@ -50,6 +50,7 @@
 
   let currentGuildId = null;
   let guildsData     = [];
+  let healthData     = null;
 
   // Theme Initialization
   const currentTheme = localStorage.getItem('theme') || 'dark';
@@ -106,7 +107,7 @@
       showScreen('servers');
       
       // Fetch bot info for logo
-      const healthObj = await api('/api/health');
+      healthData = await api('/api/health');
       if (topbarBotLogo) {
         topbarBotLogo.src = 'logo.jpg';
         topbarBotLogo.style.display = 'block';
@@ -154,7 +155,8 @@
         
         row.addEventListener('click', (e) => {
           if (!g.botInGuild) {
-            window.open('https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=8&scope=bot%20applications.commands', '_blank');
+            const cid = (healthData && healthData.clientId) ? healthData.clientId : 'YOUR_CLIENT_ID';
+            window.open(`https://discord.com/api/oauth2/authorize?client_id=${cid}&permissions=8&scope=bot%20applications.commands`, '_blank');
             return;
           }
           guildSelect.value = g.id;

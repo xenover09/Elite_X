@@ -94,7 +94,8 @@ function startDashboard(client) {
     res.json({ 
       status: 'online', 
       bot: client.user?.tag || 'connecting',
-      avatar: client.user?.displayAvatarURL() || null
+      avatar: client.user?.displayAvatarURL() || null,
+      clientId: client.user?.id || process.env.CLIENT_ID || null
     });
   });
 
