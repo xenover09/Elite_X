@@ -12,7 +12,7 @@ const logger = require('../utils/logger');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('panel')
-    .setDescription('Open the Elite AI Control Panel')
+    .setDescription('Open the Elite X Control Panel')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   /**
@@ -55,7 +55,7 @@ function buildPanelEmbed(guildName, state) {
 
   return new EmbedBuilder()
     .setColor(0x7b3fe4)
-    .setTitle('⚙️ Elite AI Control Panel')
+    .setTitle('⚙️ Elite X Control Panel')
     .setDescription('Manage your server with one click. All changes apply instantly.')
     .addFields(
       {

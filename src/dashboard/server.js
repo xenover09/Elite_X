@@ -91,7 +91,11 @@ function startDashboard(client) {
 
   // Health check
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'online', bot: client.user?.tag || 'connecting' });
+    res.json({ 
+      status: 'online', 
+      bot: client.user?.tag || 'connecting',
+      avatar: client.user?.displayAvatarURL() || null
+    });
   });
 
   // Start Listener

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Elite AI Bot — Dashboard Client Logic
+   Elite X — Dashboard Client Logic
    Manual Admin Key Login · Secure Bearer Auth · Embed Builder
    ═══════════════════════════════════════════════════════════ */
 
@@ -13,12 +13,21 @@
 
   const loginScreen       = $('#login-screen');
   const dashScreen        = $('#dashboard-screen');
+  const serversScreen     = $('#servers-screen');
+  const topbar            = $('#main-topbar');
   const loginError        = $('#login-error');
 
   const userAvatar        = $('#user-avatar');
   const userName          = $('#user-name');
   const guildSelect       = $('#guild-select');
   const guildNameDisplay  = $('#current-guild-name');
+  const mainServerTitle   = $('#main-server-title');
+  const guildsListEl      = $('#guilds-list');
+  const refreshGuildsBtn  = $('#refresh-guilds-btn');
+  const navDashboardBtn   = $('#nav-dashboard-btn');
+  const topbarBotLogo     = $('#topbar-bot-logo');
+  const mainServerAvatar  = $('#main-server-avatar');
+  const mainServerAvatarPlaceholder = $('#main-server-avatar-placeholder');
   const navItems          = $$('.nav-item');
   const tabContents       = $$('.tab-content');
   const aiToggleBtn       = $('#ai-toggle-btn');
@@ -30,9 +39,35 @@
   
   const lockBtn           = $('#lock-btn');
   const clearBtn          = $('#clear-btn');
+  const themeToggle       = $('#theme-toggle');
+  const sunIcon           = $('.sun-icon');
+  const moonIcon          = $('.moon-icon');
 
   let currentGuildId = null;
   let guildsData     = [];
+
+  // Theme Initialization
+  const currentTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeIcons(currentTheme);
+
+  themeToggle.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    let newTheme = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcons(newTheme);
+  });
+
+  function updateThemeIcons(theme) {
+    if (theme === 'dark') {
+      sunIcon.style.display = 'none';
+      moonIcon.style.display = 'block';
+    } else {
+      sunIcon.style.display = 'block';
+      moonIcon.style.display = 'none';
+    }
+  }
 
   init();
 
@@ -54,28 +89,83 @@
   function showScreen(name) {
     loginScreen.classList.toggle('active', name === 'login');
     dashScreen.classList.toggle('active', name === 'dashboard');
+    if (serversScreen) serversScreen.classList.toggle('active', name === 'servers');
+    
+    if (topbar) {
+      topbar.style.display = name === 'login' ? 'none' : 'flex';
+    }
   }
 
   async function loadDashboard(user) {
     try {
-      guildsData = await api('/api/settings/guilds');
-      showScreen('dashboard');
+      showScreen('servers');
       
+      // Fetch bot info for logo
+      const healthObj = await api('/api/health');
+      if (healthObj && healthObj.avatar && topbarBotLogo) {
+        topbarBotLogo.src = healthObj.avatar;
+        topbarBotLogo.style.display = 'block';
+      }
+
       if (user) {
         userAvatar.src = user.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
         userName.textContent = user.global_name || user.username;
       }
       
-      populateGuildSelect(guildsData);
+      await fetchAndRenderGuilds();
     } catch (e) {
       console.error('Dashboard load failed', e);
       showScreen('login');
     }
   }
 
+  async function fetchAndRenderGuilds() {
+    guildsData = await api('/api/settings/guilds');
+    populateGuildSelect(guildsData);
+    
+    if (guildsListEl) {
+      guildsListEl.innerHTML = '';
+      guildsData.forEach(g => {
+        const row = document.createElement('div');
+        row.className = 'guild-row';
+        
+        const iconHtml = g.icon 
+          ? `<img src="${g.icon}" class="guild-row-icon">`
+          : `<div class="guild-row-icon">${g.name.charAt(0)}</div>`;
+          
+        const actionHtml = g.botInGuild
+          ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`
+          : `<button class="btn btn-primary btn-sm">Invite</button>`;
+          
+        row.innerHTML = `
+          <div class="guild-row-left">
+            ${iconHtml}
+            <div class="guild-row-name">${g.name}</div>
+          </div>
+          <div class="guild-row-right">
+            ${actionHtml}
+          </div>
+        `;
+        
+        row.addEventListener('click', (e) => {
+          if (!g.botInGuild) {
+            window.open('https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=8&scope=bot%20applications.commands', '_blank');
+            return;
+          }
+          guildSelect.value = g.id;
+          selectGuild(g.id);
+          showScreen('dashboard');
+        });
+        
+        guildsListEl.appendChild(row);
+      });
+    }
+  }
+
   function populateGuildSelect(guilds) {
-    guildSelect.innerHTML = '<option value="" disabled selected>Select a server…</option>';
-    guilds.forEach((g) => {
+    guildSelect.innerHTML = '<option value="" disabled selected>Change Server</option>';
+    // Only put guilds where bot is present in the dropdown
+    guilds.filter(g => g.botInGuild).forEach((g) => {
       const opt = document.createElement('option');
       opt.value = g.id;
       opt.textContent = g.name;
@@ -94,8 +184,55 @@
   async function selectGuild(guildId) {
     currentGuildId = guildId;
     const guild = guildsData.find(g => g.id === guildId);
-    guildNameDisplay.textContent = guild ? guild.name : 'Unknown';
+    
+    const name = guild ? guild.name : 'Unknown';
+    guildNameDisplay.textContent = name;
+    if (mainServerTitle) mainServerTitle.textContent = name;
+    
+    // Set server avatar
+    const sidebarServerIcon = $('#sidebar-server-icon');
+    const sidebarServerPlaceholder = $('#sidebar-server-placeholder');
+    
+    if (mainServerAvatar && mainServerAvatarPlaceholder && guild) {
+      if (guild.icon) {
+        mainServerAvatar.src = guild.icon;
+        mainServerAvatar.style.display = 'flex';
+        mainServerAvatarPlaceholder.style.display = 'none';
+        
+        if (sidebarServerIcon) {
+          sidebarServerIcon.src = guild.icon;
+          sidebarServerIcon.style.display = 'block';
+          sidebarServerPlaceholder.style.display = 'none';
+        }
+      } else {
+        mainServerAvatar.style.display = 'none';
+        mainServerAvatarPlaceholder.style.display = 'flex';
+        
+        if (sidebarServerIcon) {
+          sidebarServerIcon.style.display = 'none';
+          sidebarServerPlaceholder.style.display = 'block';
+        }
+      }
+    }
+
+    // Fetch real stats
+    try {
+      const stats = await api(`/api/settings/${guildId}/stats`);
+      const statMembers = $('#stat-members');
+      const statTextChannels = $('#stat-text-channels');
+      const statVoiceChannels = $('#stat-voice-channels');
+      
+      if (statMembers) statMembers.textContent = stats.memberCount || 0;
+      if (statTextChannels) statTextChannels.textContent = stats.textChannels || 0;
+      if (statVoiceChannels) statVoiceChannels.textContent = stats.voiceChannels || 0;
+    } catch (e) {
+      console.error('Failed to load stats', e);
+    }
     aiToggleBtn.disabled = false;
+    
+    // Default to Server Overview tab
+    const overviewTab = $('[data-tab="card-overview"]');
+    if (overviewTab) overviewTab.click();
     
     await Promise.all([
       loadChannels(guildId),
@@ -305,6 +442,61 @@
       tabContents.forEach(c => c.classList.toggle('active', c.id === tabId));
     });
   });
+
+  const navSubBtns = $$('.nav-sub-btn');
+  navSubBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      tabContents.forEach(c => c.classList.toggle('active', c.id === targetId));
+    });
+  });
+
+  const userInfo = $('#user-info');
+  const userDropdownMenu = $('#user-dropdown-menu');
+  if (userInfo && userDropdownMenu) {
+    userInfo.addEventListener('click', (e) => {
+      userDropdownMenu.style.display = userDropdownMenu.style.display === 'none' ? 'block' : 'none';
+      e.stopPropagation();
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!userDropdownMenu.contains(e.target) && e.target !== userInfo) {
+        userDropdownMenu.style.display = 'none';
+      }
+    });
+  }
+
+  const rolesDropdownToggle = $('#roles-dropdown-toggle .select-box');
+  const rolesListContainer = $('.roles-list-container');
+  
+  if (rolesDropdownToggle && rolesListContainer) {
+    rolesDropdownToggle.addEventListener('click', (e) => {
+      rolesListContainer.style.display = rolesListContainer.style.display === 'none' ? 'block' : 'none';
+      e.stopPropagation();
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!rolesListContainer.contains(e.target) && e.target !== rolesDropdownToggle) {
+        rolesListContainer.style.display = 'none';
+      }
+    });
+
+    rolesListContainer.addEventListener('change', () => {
+      const selected = Array.from(rolesListContainer.querySelectorAll('.role-checkbox:checked'));
+      if (selected.length === 0) {
+        rolesDropdownToggle.textContent = 'Select Roles...';
+      } else {
+        rolesDropdownToggle.textContent = `${selected.length} roles selected`;
+      }
+    });
+  }
+
+  if (navDashboardBtn) {
+    navDashboardBtn.addEventListener('click', () => showScreen('servers'));
+  }
+  if (refreshGuildsBtn) {
+    refreshGuildsBtn.addEventListener('click', fetchAndRenderGuilds);
+  }
 
   function toast(msg, type) {
     const el = document.createElement('div');

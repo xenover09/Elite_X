@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Elite AI Bot — Production dashboard for managing your Discord bot." />
-  <title>Elite AI Bot — Dashboard</title>
+  <meta name="description" content="Elite X — Production dashboard for managing your Discord bot." />
+  <title>Elite X — Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -21,12 +21,11 @@
       <div class="login-card">
         <div class="login-logo">
           <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-            <rect width="56" height="56" rx="16" fill="url(#logo-grad)" />
+            <rect width="56" height="56" rx="16" fill="var(--accent)" />
             <path d="M18 36V20l10 8-10 8zm10-8l10 8V20l-10 8z" fill="#fff" fill-opacity=".9"/>
-            <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="56" y2="56"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
           </svg>
         </div>
-        <h1 class="login-title">Elite AI Bot</h1>
+        <h1 class="login-title">Elite X</h1>
         <p class="login-subtitle">Enter your Admin Key to manage the bot</p>
         
         <div class="form-group mt-20">
@@ -48,76 +47,93 @@
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
-  <!-- DASHBOARD SCREEN                            -->
+  <!-- SHARED TOPBAR                               -->
   <!-- ═══════════════════════════════════════════ -->
-  <div id="dashboard-screen" class="screen">
-
-    <!-- Top bar -->
-    <header class="topbar">
-      <div class="topbar-left">
-        <svg width="32" height="32" viewBox="0 0 56 56" fill="none">
-          <rect width="56" height="56" rx="16" fill="url(#tb-grad)" />
-          <path d="M18 36V20l10 8-10 8zm10-8l10 8V20l-10 8z" fill="#fff" fill-opacity=".9"/>
-          <defs><linearGradient id="tb-grad" x1="0" y1="0" x2="56" y2="56"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
-        </svg>
-        <span class="topbar-title">Elite AI Bot</span>
-      </div>
-      <div class="topbar-right">
-        <div id="user-info" class="user-info">
+  <header class="topbar" id="main-topbar" style="display: none;">
+    <a href="/" class="topbar-left" style="text-decoration: none;">
+      <img id="topbar-bot-logo" src="" alt="Bot" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; display: none;" />
+      <span class="topbar-title">Elite X</span>
+      <span class="topbar-link">Help <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </a>
+    <div class="topbar-right">
+      <button id="nav-dashboard-btn" class="btn btn-primary mr-15" style="padding: 10px 24px; font-size: 1rem; font-weight: 700; border-radius: 8px;">Dashboard</button>
+      <div style="position: relative;">
+        <div id="user-info" class="user-info" style="cursor: pointer;">
           <img id="user-avatar" class="user-avatar" src="" alt="Avatar" />
           <div class="user-text">
             <span id="user-name" class="user-name"></span>
-            <span class="user-badge">Admin</span>
           </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <a href="/auth/logout" id="logout-btn" class="btn btn-sm btn-outline" title="Logout">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </a>
+        <div id="user-dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 5px; min-width: 150px; box-shadow: var(--shadow-md); margin-top: 10px; z-index: 9999;">
+          <a href="/auth/logout" style="display: flex; align-items: center; gap: 10px; color: var(--danger); text-decoration: none; padding: 10px; border-radius: 6px; font-weight: 600;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </a>
+        </div>
       </div>
-    </header>
+      <button id="theme-toggle" class="theme-toggle-btn ml-10" title="Toggle Theme">
+        <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
 
-    <!-- Guild selector bar -->
-    <div class="guild-bar">
-      <div class="guild-bar-top">
-        <button id="back-btn" class="btn btn-sm btn-outline-nav">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          Back to Servers
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SERVERS SCREEN (MY GUILDS)                  -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="servers-screen" class="screen">
+    <div class="servers-container">
+      <div class="servers-header">
+        <h1 class="servers-title">My Guilds</h1>
+        <button class="btn btn-outline" id="refresh-guilds-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.26l5.08 5.08"/></svg>
         </button>
       </div>
-      <div class="guild-info-row">
-        <h1 class="managing-title">Managing: <span id="current-guild-name">Select a Server</span></h1>
-      </div>
-      <div class="guild-select-row">
-        <label for="guild-select" class="guild-label">Select Server:</label>
-        <div class="select-wrapper">
-          <select id="guild-select" class="guild-select">
-            <option value="" disabled selected>Select a server…</option>
-          </select>
-          <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
+      <div class="guilds-list" id="guilds-list">
+        <!-- Rendered via JS -->
       </div>
     </div>
+  </div>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- DASHBOARD SCREEN                            -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="dashboard-screen" class="screen">
     <!-- Main Dashboard Wrapper -->
     <div class="dashboard-wrapper">
       
       <!-- Sidebar Navigation -->
       <aside class="sidebar">
-        <div class="sidebar-header">
-          <span class="sidebar-brand">Elite Console</span>
+        <!-- Welcomer Style Server Selector -->
+        <div class="sidebar-server-selector">
+          <div class="server-selector-icon">
+            <img id="sidebar-server-icon" src="" alt="Server Logo" style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; display: none;" />
+            <svg id="sidebar-server-placeholder" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="server-selector-text">
+            <div class="server-name-truncate" id="current-guild-name" style="cursor: pointer;" onclick="document.querySelector('.nav-item[data-tab=\'card-overview\']').click()">Select Server</div>
+            <div class="server-change-text" style="position: relative;">
+              <span style="font-size: 0.75rem; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600;">Change Server <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <select id="guild-select" class="guild-select-hidden">
+                <option value="" disabled selected>Change Server</option>
+              </select>
+            </div>
+          </div>
         </div>
+
+        <div class="sidebar-category">Main Menu</div>
         <nav class="sidebar-nav">
-          <button class="nav-item active" data-tab="card-lock">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            <span>Channel Lock</span>
+          <button class="nav-item active" data-tab="card-overview">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span>Server Overview</span>
           </button>
-          <button class="nav-item" data-tab="card-embed">
+          
+          <div class="nav-divider"></div>
+
+          <button class="nav-item" data-tab="card-manage">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <span>Send Embed</span>
-          </button>
-          <button class="nav-item" data-tab="card-clear">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.66V20a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>
-            <span>Clear Chat</span>
+            <span>Manage Server</span>
           </button>
           <div class="nav-divider"></div>
           <button class="nav-item" data-tab="card-ai">
@@ -131,17 +147,96 @@
       <div class="main-content">
         <!-- Dashboard Content -->
         <main class="dashboard vertical-stack">
+          
+          <!-- Card 0: Server Overview -->
+          <section class="tab-content active" id="card-overview">
+            <div class="server-header-container">
+              <div class="server-banner"></div>
+          <div class="server-header-content">
+            <div id="main-server-avatar-placeholder" class="server-avatar-large">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <img id="main-server-avatar" class="server-avatar-large" src="" alt="Server Logo" style="display: none; object-fit: cover;" />
+            <h1 class="main-server-title" id="main-server-title">Select a Server</h1>
+            
+            <div class="stat-cards">
+              <div class="stat-card">
+                <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <div class="stat-info">
+                  <div class="stat-label">Current Server Members</div>
+                  <div class="stat-value" id="stat-members">--</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <div class="stat-info">
+                  <div class="stat-label">Text Channels</div>
+                  <div class="stat-value" id="stat-text-channels">--</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+                <div class="stat-info">
+                  <div class="stat-label">Voice Channels</div>
+                  <div class="stat-value" id="stat-voice-channels">--</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+          </section>
+
+          <!-- Card: Manage Server Menu -->
+          <section class="tab-content" id="card-manage" style="padding: 20px;">
+            <h2 class="managing-title text-accent" style="margin-bottom: 5px; font-size: 1.8rem;">MANAGE SERVER</h2>
+            <p class="card-desc" style="margin-bottom: 30px;">Select an action to perform on this server.</p>
+            
+            <div class="manage-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+              
+              <!-- Module 1 -->
+              <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'" onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-lock\']').click()">
+                <div class="card-icon card-icon-lock" style="margin: 0 auto 15px auto;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--text-primary);">Channel Lock</h3>
+                <p class="text-muted" style="font-size: 0.9rem;">Lock channels quickly to stop messages.</p>
+                <button class="nav-sub-btn" data-target="card-lock" style="display:none;"></button>
+              </div>
+
+              <!-- Module 2 -->
+              <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'" onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-embed\']').click()">
+                <div class="card-icon card-icon-embed-new" style="margin: 0 auto 15px auto;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--text-primary);">Send Embed</h3>
+                <p class="text-muted" style="font-size: 0.9rem;">Create and send rich embeds easily.</p>
+                <button class="nav-sub-btn" data-target="card-embed" style="display:none;"></button>
+              </div>
+
+              <!-- Module 3 -->
+              <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'" onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-clear\']').click()">
+                <div class="card-icon card-icon-clear" style="margin: 0 auto 15px auto;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.66V20a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--text-primary);">Clear Chat</h3>
+                <p class="text-muted" style="font-size: 0.9rem;">Purge messages in bulk instantly.</p>
+                <button class="nav-sub-btn" data-target="card-clear" style="display:none;"></button>
+              </div>
+
+            </div>
+          </section>
 
           <!-- Card 1: Channel Lock/Unlock -->
-          <section class="card tab-content active" id="card-lock">
+          <section class="card tab-content" id="card-lock" style="overflow: visible;">
+            <button class="btn btn-sm btn-outline nav-sub-btn" data-target="card-manage" style="margin-bottom: 20px;">&larr; Back to Manage Server</button>
             <!-- ... existing content ... -->
             <div class="card-header">
               <div class="card-icon card-icon-lock">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
               </div>
-              <h2 class="card-title text-blue">Channel Lock/Unlock</h2>
+              <h2 class="card-title" style="color: var(--text-primary);">Channel Lock/Unlock</h2>
             </div>
-            <p class="card-desc">Select channel aur roles. Channel private ho jayega aur sirf in roles ko dikhega.</p>
+            <p class="card-desc">Select a channel and roles. The channel will become private and only visible to the selected roles.</p>
             <div class="form-group">
               <label>Select Channel:</label>
               <select class="channel-select">
@@ -150,18 +245,10 @@
             </div>
             <div class="form-group mt-15">
               <label>Allow Roles (Admin/VIP):</label>
-              <div class="roles-list-container">
-                <div class="role-item">
-                  <input type="checkbox" id="role-everyone">
-                  <label for="role-everyone">@everyone</label>
-                </div>
-                <div class="role-item">
-                  <input type="checkbox" id="role-admin">
-                  <label for="role-admin">🛡️ [ 👑 · Σ L I T Σ F Ω U Π D Σ R ]</label>
-                </div>
-                <div class="role-item">
-                  <input type="checkbox" id="role-member">
-                  <label for="role-member">👤 [ 💠 · Μ Σ Μ Β Σ R Σ ]</label>
+              <div class="custom-multi-select" id="roles-dropdown-toggle">
+                <div class="select-box">Select Roles...</div>
+                <div class="dropdown-list roles-list-container" style="display:none;">
+                  <!-- populated by JS -->
                 </div>
               </div>
             </div>
@@ -170,13 +257,14 @@
 
           <!-- Card 2: Send Advanced Embed -->
           <section class="card tab-content" id="card-embed">
+            <button class="btn btn-sm btn-outline nav-sub-btn" data-target="card-manage" style="margin-bottom: 20px;">&larr; Back to Manage Server</button>
             <div class="card-header">
               <div class="card-icon card-icon-embed-new">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               </div>
-              <h2 class="card-title text-cyan">Send Advanced Embed</h2>
+              <h2 class="card-title" style="color: var(--text-primary);">Send Advanced Embed</h2>
             </div>
-            <p class="card-desc">Pricing, Rules, ya Announcements bhejne ke liye.</p>
+            <p class="card-desc">Send advanced embeds for pricing, rules, or announcements.</p>
             <form id="embed-form" class="embed-form">
               <div class="form-group">
                 <label>Select Channel:</label>
@@ -196,7 +284,7 @@
               </div>
               <div class="form-group">
                 <label>Message (Description):</label>
-                <textarea id="embed-desc" rows="4" placeholder="Rules, Announcements ya Features yahan likhein..."></textarea>
+                <textarea id="embed-desc" rows="4" placeholder="Write rules, announcements, or features here..."></textarea>
               </div>
               
               <div class="form-group">
@@ -220,13 +308,14 @@
 
           <!-- Card 3: Clear Chat (Clone Method) -->
           <section class="card tab-content" id="card-clear">
+            <button class="btn btn-sm btn-outline nav-sub-btn" data-target="card-manage" style="margin-bottom: 20px;">&larr; Back to Manage Server</button>
             <div class="card-header">
               <div class="card-icon card-icon-clear">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.66V20a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>
               </div>
-              <h2 class="card-title text-orange">Clear Chat (Clone Method)</h2>
+              <h2 class="card-title" style="color: var(--text-primary);">Clear Chat</h2>
             </div>
-            <p class="card-desc">Channel ki poori chat 1 click mein hamesha ke liye clear karein.</p>
+            <p class="card-desc">Clear the entire channel chat permanently with a single click.</p>
             <div class="form-group">
               <label>Select Channel:</label>
               <select class="channel-select">
@@ -252,12 +341,7 @@
             </div>
           </section>
 
-          <!-- Dashboard Footer -->
-          <footer style="text-align: center; margin-top: 40px; padding: 20px 0; color: var(--text-muted); font-size: 0.85rem;">
-            Elite AI Bot &copy; The Elite Circle<br><br>
-            <a href="/terms" target="_blank" style="color: var(--text-accent); text-decoration: underline; margin: 0 10px;">Terms of Service</a>
-            <a href="/privacy" target="_blank" style="color: var(--text-accent); text-decoration: underline; margin: 0 10px;">Privacy Policy</a>
-          </footer>
+
 
         </main>
       </div>
