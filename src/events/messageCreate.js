@@ -126,8 +126,11 @@ module.exports = {
       }
     } catch (err) {
       logger.error(`AI chat error for ${message.author.tag}:`, err.message);
+      const displayError = err.userMessage && err.userMessage !== 'Failed to get a response from the AI. Please try again later.' 
+        ? err.userMessage 
+        : err.message;
       await message.channel.send(
-        `<@${message.author.id}> ⚠️ AI is temporarily unavailable. Please try again in a moment.`
+        `<@${message.author.id}> ⚠️ **AI Error:** ${displayError}`
       ).catch(() => {});
     }
   },
