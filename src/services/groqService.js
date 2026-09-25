@@ -68,7 +68,8 @@ async function queryGroq(question, guildState) {
 
       // --- AUTO DETECT GOOGLE GEMINI KEY ---
       if (apiKey && (apiKey.startsWith('AIzaS') || apiKey.startsWith('AQ.'))) {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const gModel = (guildState && guildState.aiModel) ? guildState.aiModel.trim() : 'gemini-3.8-flash';
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${gModel}:generateContent?key=${apiKey}`;
         const response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
