@@ -14,20 +14,6 @@ router.get('/', authMiddleware, (req, res) => {
 });
 
 /**
- * GET /api/settings/bot-stats
- * Returns global bot statistics
- */
-router.get('/bot-stats', (req, res) => {
-  const client = req.app.get('discordClient');
-  if (!client) return res.status(500).json({ error: 'Client not ready' });
-  
-  const serverCount = client.guilds.cache.size;
-  const userCount = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
-  
-  res.json({ serverCount, userCount });
-});
-
-/**
  * POST /api/settings/toggle
  * Toggles the AI ON/OFF.
  */
