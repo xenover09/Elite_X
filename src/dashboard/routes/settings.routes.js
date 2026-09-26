@@ -4,13 +4,14 @@ const express = require('express');
 const router = express.Router();
 const { getSettings, toggleAI, updateAISettings } = require('../../services/settingsService');
 const authMiddleware = require('../middleware/auth');
+const guildAuthMiddleware = require('../middleware/guildAuth');
 
 /**
  * GET /api/settings
  * Returns current AI state.
  */
-router.get('/', authMiddleware, (req, res) => {
-  const { guildId } = req.query;
+router.get('/', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
   res.json(getSettings(guildId));
 });
 
@@ -18,8 +19,8 @@ router.get('/', authMiddleware, (req, res) => {
  * POST /api/settings/toggle
  * Toggles the AI ON/OFF.
  */
-router.post('/toggle', authMiddleware, (req, res) => {
-  const { guildId } = req.body;
+router.post('/toggle', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
   if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
   const result = toggleAI(guildId);
   res.json(result);
@@ -29,8 +30,9 @@ router.post('/toggle', authMiddleware, (req, res) => {
  * POST /api/settings/ai
  * Updates Advanced AI settings (channel, api key).
  */
-router.post('/ai', authMiddleware, (req, res) => {
-  const { guildId, aiChannel, aiApiKey } = req.body;
+router.post('/ai', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
+  const { aiChannel, aiApiKey } = req.body;
   if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
   const result = updateAISettings(guildId, { aiChannel, aiApiKey });
   res.json(result);
@@ -76,8 +78,8 @@ router.get('/guilds', authMiddleware, (req, res) => {
 /**
  * GET /api/settings/:guildId/channels
  */
-router.get('/:guildId/channels', authMiddleware, (req, res) => {
-  const { guildId } = req.params;
+router.get('/:guildId/channels', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
   const client = req.app.get('discordClient');
   const guild = client.guilds.cache.get(guildId);
   if (!guild) return res.status(404).json({ error: 'Guild not found' });
@@ -93,8 +95,8 @@ router.get('/:guildId/channels', authMiddleware, (req, res) => {
  * GET /api/settings/:guildId/stats
  * Returns real server stats (members, channels, icon)
  */
-router.get('/:guildId/stats', authMiddleware, (req, res) => {
-  const { guildId } = req.params;
+router.get('/:guildId/stats', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
   const client = req.app.get('discordClient');
   const guild = client.guilds.cache.get(guildId);
   if (!guild) return res.status(404).json({ error: 'Guild not found' });
@@ -110,8 +112,8 @@ router.get('/:guildId/stats', authMiddleware, (req, res) => {
 /**
  * GET /api/settings/:guildId/roles
  */
-router.get('/:guildId/roles', authMiddleware, (req, res) => {
-  const { guildId } = req.params;
+router.get('/:guildId/roles', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
   const client = req.app.get('discordClient');
   const guild = client.guilds.cache.get(guildId);
   if (!guild) return res.status(404).json({ error: 'Guild not found' });

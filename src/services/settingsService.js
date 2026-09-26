@@ -8,10 +8,12 @@ const { getState, toggleFeature, updateAISettings } = require('../store/panelSta
  */
 function getSettings(guildId) {
   const state = getState(guildId);
+  const isKeyPresent = !!state.aiApiKey;
   return { 
     aiEnabled: state.aiChat,
     aiChannel: state.aiChannel,
-    aiApiKey: state.aiApiKey
+    hasApiKey: isKeyPresent,
+    aiApiKey: isKeyPresent ? 'gsk_••••••••••••' : ''
   };
 }
 

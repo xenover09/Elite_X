@@ -3,6 +3,7 @@
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const session = require('express-session');
 const passport = require('passport');
 const DiscordStrategy = require('passport-discord').Strategy;
@@ -18,6 +19,15 @@ const adminRoutes = require('./routes/admin.routes');
  * Starts the modular Express dashboard server.
  */
 function startDashboard(client) {
+  if (!process.env.SESSION_SECRET) {
+    logger.error('[SECURITY CRITICAL] SESSION_SECRET is not defined in .env! Halting startup.');
+    process.exit(1);
+  }
+  if (!process.env.ADMIN_KEY) {
+    logger.error('[SECURITY CRITICAL] ADMIN_KEY is not defined in .env! Halting startup.');
+    process.exit(1);
+  }
+
   const app = express();
   const port = process.env.PORT || 3001;
 
@@ -31,12 +41,20 @@ function startDashboard(client) {
     callbackURL: process.env.REDIRECT_URI,
     scope: ['identify', 'guilds']
   }, (accessToken, refreshToken, profile, done) => {
-    // Here you could check if the user ID is in an allowed list
-    // process.nextTick(() => done(null, profile));
     return done(null, profile);
   }));
 
-  app.use(cors());
+  // Security Headers
+  app.use(helmet({
+    contentSecurityPolicy: false // Disable CSP if it interferes with inline scripts/styles
+  }));
+
+  // CORS
+  app.use(cors({
+    origin: process.env.PUBLIC_URL || `http://localhost:${port}`,
+    credentials: true
+  }));
+
   app.use(express.json());
   
   // Diagnostic request logger
@@ -50,11 +68,12 @@ function startDashboard(client) {
 
   // Session Middleware
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'elite_bot_secret_xyz_123',
-    resave: true,
-    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
     cookie: { 
-      secure: false, // Railway handles TLS; setting false avoids trust-proxy header drops
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
   }));

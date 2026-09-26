@@ -50,7 +50,11 @@ function toggleFeature(guildId, feature) {
 function updateAISettings(guildId, settings) {
   const current = getState(guildId);
   current.aiChannel = settings.aiChannel || '';
-  current.aiApiKey = settings.aiApiKey || '';
+  if (settings.aiApiKey && settings.aiApiKey !== 'gsk_••••••••••••') {
+    current.aiApiKey = settings.aiApiKey;
+  } else if (!settings.aiApiKey) {
+    current.aiApiKey = '';
+  }
   state.set(guildId, current);
   return current;
 }

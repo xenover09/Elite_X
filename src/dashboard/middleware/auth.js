@@ -13,11 +13,12 @@ function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
   console.warn(`[AUTH] Unauthorized API access attempt to ${req.originalUrl}. AuthHeader: ${authHeader ? 'Present' : 'Missing'}`);
 
-  // Fallback for ADMIN_KEY
-  const adminKey = process.env.ADMIN_KEY || "elite_secure_123";
-  if (authHeader && authHeader.startsWith('Bearer ') && authHeader.split(' ')[1] === adminKey) {
-    console.log('[AUTH] Authorized via legacy ADMIN_KEY');
-    return next();
+  // Admin Key fallback
+  if (process.env.ADMIN_KEY) {
+    if (authHeader && authHeader.startsWith('Bearer ') && authHeader.split(' ')[1] === process.env.ADMIN_KEY) {
+      console.log('[AUTH] Authorized via legacy ADMIN_KEY');
+      return next();
+    }
   }
 
   return res.status(403).json({ success: false, message: "Unauthorized: Please login with Discord" });
