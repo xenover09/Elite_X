@@ -126,6 +126,15 @@
   }
 
   async function fetchAndRenderGuilds() {
+    // Fetch global stats
+    try {
+      const stats = await api('/api/settings/bot-stats');
+      if (stats && stats.serverCount !== undefined) {
+        document.getElementById('global-server-count').textContent = stats.serverCount.toLocaleString();
+        document.getElementById('global-user-count').textContent = stats.userCount.toLocaleString();
+      }
+    } catch(e) { console.error('Failed to load global bot stats'); }
+
     guildsData = await api('/api/settings/guilds');
     populateGuildSelect(guildsData);
     
