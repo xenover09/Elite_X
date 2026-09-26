@@ -786,7 +786,7 @@
       auditNuke.textContent = 'Nuke Risk: --';
       auditNuke.style.color = 'var(--text-muted)';
       
-      const data = await api(`/api/panel/security-audit`);
+      const data = await api(`/api/panel/security-audit?guildId=${currentGuildId}`);
       
       // small delay for animation effect
       setTimeout(() => {
