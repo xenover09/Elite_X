@@ -543,7 +543,13 @@
   }
 
   if (navDashboardBtn) {
-    navDashboardBtn.addEventListener('click', () => showScreen('servers'));
+    navDashboardBtn.addEventListener('click', () => {
+      if (window.location.pathname !== '/dashboard') {
+        window.location.href = '/dashboard';
+      } else {
+        showScreen('servers');
+      }
+    });
   }
   if (refreshGuildsBtn) {
     refreshGuildsBtn.addEventListener('click', fetchAndRenderGuilds);
