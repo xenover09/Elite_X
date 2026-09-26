@@ -123,7 +123,7 @@ input, textarea, select { font-family: inherit; }
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--bg-body);
+  background: var(--bg-base);
   color: var(--text-primary);
   overflow-y: auto;
 }
@@ -344,7 +344,7 @@ input, textarea, select { font-family: inherit; }
 .landing-footer {
   padding: 40px;
   text-align: center;
-  background: var(--bg-body);
+  background: var(--bg-base);
   border-top: 1px solid var(--border);
   color: var(--text-muted);
 }
