@@ -43,6 +43,10 @@
       font-size: 14px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
     }
 
     /* Typography */
@@ -64,9 +68,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      flex-shrink: 0;
     }
 
     .header-title {
@@ -76,10 +78,76 @@
     }
     .header-title svg { stroke: var(--text-muted); }
 
+    .dashboard-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-3) var(--space-2);
+      gap: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover {
+      background-color: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background-color: rgba(212, 175, 55, 0.1);
+      color: var(--accent);
+      border-color: rgba(212, 175, 55, 0.2);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-5) var(--space-4);
+    }
+
     .container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: var(--space-5) var(--space-3);
+    }
+
+    .tab-section {
+      display: none;
+    }
+    .tab-section.active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Buttons */
@@ -98,10 +166,6 @@
       outline: none;
       text-decoration: none;
     }
-    .btn:focus-visible {
-      box-shadow: 0 0 0 2px var(--bg-body), 0 0 0 4px var(--accent);
-    }
-
     .btn-outline {
       background-color: transparent;
       border-color: var(--border);
@@ -111,10 +175,6 @@
       background-color: var(--bg-hover);
       border-color: var(--border-light);
     }
-    .btn-outline:active:not(:disabled) {
-      background-color: rgba(255,255,255,0.05);
-    }
-
     .btn:disabled {
       cursor: not-allowed;
       color: var(--text-disabled);
@@ -146,6 +206,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: var(--space-3);
+      margin-bottom: var(--space-4);
     }
 
     .stat-label {
@@ -172,7 +233,7 @@
       border: 1px solid var(--border);
       padding: var(--space-3);
       border-radius: var(--radius);
-      margin-bottom: var(--space-6);
+      margin-bottom: var(--space-4);
     }
     .badge-soon {
       display: inline-block;
@@ -222,11 +283,9 @@
     tbody tr:nth-child(even) {
       background-color: var(--bg-striped);
     }
-
     tbody tr:hover {
       background-color: var(--bg-hover);
     }
-
     tbody tr:last-child td {
       border-bottom: none;
     }
@@ -246,7 +305,6 @@
       font-weight: 600;
       color: var(--text-muted);
     }
-
     .server-name-cell {
       display: flex;
       align-items: center;
@@ -268,7 +326,7 @@
     .skeleton-icon { width: 24px; height: 24px; }
     .skeleton-value { height: 32px; width: 60px; margin-top: var(--space-1); }
 
-    /* Error State */
+    /* Error & Toast */
     .error-msg {
       color: #ef4444;
       background-color: rgba(239, 68, 68, 0.1);
@@ -277,8 +335,6 @@
       border: 1px solid rgba(239, 68, 68, 0.2);
       font-size: 13px;
     }
-
-    /* Toast */
     .toast {
       position: fixed;
       bottom: var(--space-4);
@@ -299,21 +355,17 @@
       opacity: 1;
       transform: translateY(0);
     }
-
-    @media (max-width: 768px) {
-      .premium-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-3);
-      }
-      .header { padding: var(--space-2); }
-      .container { padding: var(--space-4) var(--space-2); }
-    }
-  
+    
     .log-error { color: #ef4444; }
     .log-warn { color: #eab308; }
     .log-info { color: var(--text-muted); }
-</style>
+
+    @media (max-width: 768px) {
+      .dashboard-layout { flex-direction: column; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; overflow-x: auto; padding: var(--space-2); }
+      .nav-item { padding: 8px 12px; white-space: nowrap; }
+    }
+  </style>
 </head>
 <body>
 
@@ -325,123 +377,154 @@
     <a href="/dashboard" class="btn btn-outline">Back to App</a>
   </header>
 
-  <main class="container">
-    
-    <div id="error-container" style="display: none; margin-bottom: var(--space-4);"></div>
-
-    <h2>System Overview</h2>
-    <div class="grid-2">
-      <div class="card">
-        <div class="stat-label">Total Servers</div>
-        <div class="stat-value tabular skeleton skeleton-value" id="total-servers"></div>
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <div class="nav-item active" data-target="tab-overview">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+        Overview
       </div>
-      <div class="card">
-        <div class="stat-label">Total Users Reached</div>
-        <div class="stat-value tabular skeleton skeleton-value" id="total-users"></div>
+      <div class="nav-item" data-target="tab-servers">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Connected Servers
       </div>
-    </div>
-
-    <div class="premium-section">
-      <div>
-        <h3 style="margin-bottom: var(--space-1);">Premium Management <span class="badge-soon">Soon</span></h3>
-        <p style="font-size: 13px;">Manage quota limits and model overrides for specific guilds.</p>
+      <div class="nav-item" data-target="tab-blacklist">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+        Blacklist
       </div>
-      <button class="btn btn-outline" disabled>Manage Premium</button>
-    </div>
-
-    <h2>Connected Servers</h2>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Server Name</th>
-            <th>Server ID</th>
-            <th>Members</th>
-            <th>Owner ID</th>
-            <th>Joined At</th>
-          </tr>
-        </thead>
-        <tbody id="admin-table-body">
-          <!-- Skeletons -->
-          <tr>
-            <td><div style="display: flex; gap: 8px;"><div class="skeleton skeleton-icon"></div><div class="skeleton skeleton-text" style="width: 120px;"></div></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-          </tr>
-          <tr>
-            <td><div style="display: flex; gap: 8px;"><div class="skeleton skeleton-icon"></div><div class="skeleton skeleton-text" style="width: 90px;"></div></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-            <td><div class="skeleton skeleton-text short"></div></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-
-    <!-- Blacklist Section -->
-    <h2 style="margin-top: var(--space-5);">Global Blacklist</h2>
-    <div class="card" style="margin-bottom: var(--space-4);">
-      <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3); flex-wrap: wrap;">
-        <select id="bl-type" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;">
-          <option value="user">User ID</option>
-          <option value="guild">Server ID</option>
-        </select>
-        <input type="text" id="bl-id" placeholder="Discord ID (17-20 digits)" style="flex: 1; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;" />
-        <input type="text" id="bl-reason" placeholder="Reason (Optional)" style="flex: 2; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;" />
-        <button class="btn btn-outline" id="bl-add-btn" style="border-color: var(--accent); color: var(--accent);">Add to Blacklist</button>
+      <div class="nav-item" data-target="tab-logs">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Error Logs
       </div>
+    </aside>
 
-      <div class="table-container" style="max-height: 300px; overflow-y: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 80px;">Type</th>
-              <th>Discord ID</th>
-              <th>Reason</th>
-              <th>Date</th>
-              <th style="text-align: right; width: 100px;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="blacklist-body">
-            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading blacklist...</td></tr>
-          </tbody>
-        </table>
+    <main class="main-content">
+      <div class="container">
+        <div id="error-container" style="display: none; margin-bottom: var(--space-4);"></div>
+
+        <!-- OVERVIEW TAB -->
+        <section id="tab-overview" class="tab-section active">
+          <h2>System Overview</h2>
+          <div class="grid-2">
+            <div class="card" style="margin-bottom:0;">
+              <div class="stat-label">Total Servers</div>
+              <div class="stat-value tabular skeleton skeleton-value" id="total-servers"></div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="stat-label">Total Users Reached</div>
+              <div class="stat-value tabular skeleton skeleton-value" id="total-users"></div>
+            </div>
+          </div>
+
+          <div class="premium-section">
+            <div>
+              <h3 style="margin-bottom: var(--space-1);">Premium Management <span class="badge-soon">Soon</span></h3>
+              <p style="font-size: 13px;">Manage quota limits and model overrides for specific guilds.</p>
+            </div>
+            <button class="btn btn-outline" disabled>Manage Premium</button>
+          </div>
+        </section>
+
+        <!-- SERVERS TAB -->
+        <section id="tab-servers" class="tab-section">
+          <h2>Connected Servers</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Server Name</th>
+                  <th>Server ID</th>
+                  <th>Members</th>
+                  <th>Owner ID</th>
+                  <th>Joined At</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body">
+                <!-- Skeletons -->
+                <tr>
+                  <td><div style="display: flex; gap: 8px;"><div class="skeleton skeleton-icon"></div><div class="skeleton skeleton-text" style="width: 120px;"></div></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                </tr>
+                <tr>
+                  <td><div style="display: flex; gap: 8px;"><div class="skeleton skeleton-icon"></div><div class="skeleton skeleton-text" style="width: 90px;"></div></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                  <td><div class="skeleton skeleton-text short"></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- BLACKLIST TAB -->
+        <section id="tab-blacklist" class="tab-section">
+          <h2>Global Blacklist</h2>
+          <div class="card">
+            <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3); flex-wrap: wrap;">
+              <select id="bl-type" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;">
+                <option value="user">User ID</option>
+                <option value="guild">Server ID</option>
+              </select>
+              <input type="text" id="bl-id" placeholder="Discord ID (17-20 digits)" style="flex: 1; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;" />
+              <input type="text" id="bl-reason" placeholder="Reason (Optional)" style="flex: 2; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;" />
+              <button class="btn btn-outline" id="bl-add-btn" style="border-color: var(--accent); color: var(--accent);">Add</button>
+            </div>
+
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">Type</th>
+                    <th>Discord ID</th>
+                    <th>Reason</th>
+                    <th>Date</th>
+                    <th style="text-align: right; width: 100px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="blacklist-body">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading blacklist...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- LOGS TAB -->
+        <section id="tab-logs" class="tab-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+            <h2>System Error Logs</h2>
+            <div style="display: flex; gap: var(--space-2);">
+              <select id="log-level" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 4px 8px; border-radius: var(--radius); font-size: 12px;">
+                <option value="all">All Levels</option>
+                <option value="error" selected>Errors Only</option>
+                <option value="warn">Warnings</option>
+                <option value="info">Info</option>
+              </select>
+              <button class="btn btn-outline" id="refresh-logs-btn" style="padding: 4px 10px; font-size: 12px;">Refresh</button>
+            </div>
+          </div>
+          <div class="table-container" style="max-height: 500px; overflow-y: auto;">
+            <table style="font-family: var(--font-mono); font-size: 12px;">
+              <thead>
+                <tr>
+                  <th style="width: 160px;">Timestamp</th>
+                  <th style="width: 80px;">Level</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody id="logs-body">
+                <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Loading logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
       </div>
-    </div>
-
-    <!-- Logs Section -->
-    <h2 style="margin-top: var(--space-5); display: flex; justify-content: space-between; align-items: center;">
-      System Error Logs
-      <div style="display: flex; gap: var(--space-2);">
-        <select id="log-level" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 4px 8px; border-radius: var(--radius); font-size: 12px;">
-          <option value="all">All Levels</option>
-          <option value="error" selected>Errors Only</option>
-          <option value="warn">Warnings</option>
-          <option value="info">Info</option>
-        </select>
-        <button class="btn btn-outline" id="refresh-logs-btn" style="padding: 4px 10px; font-size: 12px;">Refresh</button>
-      </div>
-    </h2>
-    <div class="table-container" style="max-height: 400px; overflow-y: auto; margin-bottom: var(--space-5);">
-      <table style="font-family: var(--font-mono); font-size: 12px;">
-        <thead>
-          <tr>
-            <th style="width: 160px;">Timestamp</th>
-            <th style="width: 80px;">Level</th>
-            <th>Message</th>
-          </tr>
-        </thead>
-        <tbody id="logs-body">
-          <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Loading logs...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-  </main>
+    </main>
+  </div>
 
   <div id="toast" class="toast">Copied to clipboard</div>
 
@@ -479,33 +562,43 @@
       });
     }
 
+    // Tab Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        // Remove active class from all nav items
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Hide all sections
+        document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+        
+        // Show target section
+        const targetId = item.getAttribute('data-target');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+
     async function loadAdminData() {
       try {
         const res = await fetch('/api/admin/stats');
-        
         if (res.status === 401 || res.status === 403) {
           const errData = await res.json().catch(()=>({}));
           alert(errData.error || 'Access Denied. You are not the Developer. Redirecting...');
           window.location.href = '/dashboard';
           return;
         }
-        
         if (!res.ok) throw new Error('API returned status ' + res.status);
-        
         const data = await res.json();
         
         const totalServersEl = document.getElementById('total-servers');
         const totalUsersEl = document.getElementById('total-users');
-        
         totalServersEl.classList.remove('skeleton', 'skeleton-value');
         totalUsersEl.classList.remove('skeleton', 'skeleton-value');
-        
         totalServersEl.textContent = data.totalGuilds;
         totalUsersEl.textContent = data.totalUsers.toLocaleString();
         
         const tbody = document.getElementById('admin-table-body');
         tbody.innerHTML = '';
-        
         if (!data.guilds || data.guilds.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 40px;">No servers connected yet.</td></tr>';
           return;
@@ -515,11 +608,9 @@
           const tr = document.createElement('tr');
           const date = new Date(g.joinedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
           const escapedName = escapeHtml(g.name);
-          
           const iconHtml = g.icon 
             ? `<img src="${g.icon}" class="guild-icon" alt="">`
             : `<div class="guild-icon">${escapedName.charAt(0)}</div>`;
-            
           tr.innerHTML = `
             <td><div class="server-name-cell">${iconHtml} ${escapedName}</div></td>
             <td class="mono copy-id" title="Click to copy">${g.id}</td>
@@ -528,33 +619,25 @@
             <td class="tabular" style="color: var(--text-muted);">${date}</td>`;
           tbody.appendChild(tr);
         });
-        
         bindCopyEvents();
-        
       } catch (err) {
         console.error(err);
         const errContainer = document.getElementById('error-container');
         errContainer.style.display = 'block';
         errContainer.innerHTML = `<div class="error-msg">Failed to load system statistics. Please try refreshing.</div>`;
-        
         document.getElementById('total-servers').classList.remove('skeleton', 'skeleton-value');
         document.getElementById('total-users').classList.remove('skeleton', 'skeleton-value');
         document.getElementById('admin-table-body').innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">Data unavailable</td></tr>';
       }
     }
-    
-    loadAdminData();
 
-    // --- Blacklist Logic ---
     async function loadBlacklist() {
       try {
         const res = await fetch('/api/admin/blacklist');
         if (!res.ok) return;
         const data = await res.json();
-        
         const tbody = document.getElementById('blacklist-body');
         tbody.innerHTML = '';
-        
         let hasEntries = false;
         
         const renderRow = (type, id, info) => {
@@ -568,8 +651,7 @@
             <td class="tabular" style="color: var(--text-muted);">${d}</td>
             <td style="text-align: right;">
               <button class="btn btn-outline remove-bl-btn" data-type="${type}" data-id="${id}" style="padding: 4px 8px; font-size: 11px; color: #ef4444; border-color: rgba(239,68,68,0.3);">Remove</button>
-            </td>
-          `;
+            </td>`;
           tbody.appendChild(tr);
         };
         
@@ -581,13 +663,11 @@
         }
         
         bindCopyEvents();
-        
         document.querySelectorAll('.remove-bl-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const type = e.target.getAttribute('data-type');
             const id = e.target.getAttribute('data-id');
             if (!confirm(`Are you sure you want to remove ${type} ${id} from the blacklist?`)) return;
-            
             try {
               const r = await fetch('/api/admin/blacklist', {
                 method: 'DELETE',
@@ -595,29 +675,19 @@
                 body: JSON.stringify({ type, id })
               });
               const resData = await r.json();
-              if (resData.success) {
-                showToast(resData.message);
-                loadBlacklist();
-              } else {
-                showToast(resData.error || 'Error removing entry');
-              }
-            } catch(err) {
-              showToast('Network error');
-            }
+              if (resData.success) { showToast(resData.message); loadBlacklist(); } 
+              else { showToast(resData.error || 'Error removing entry'); }
+            } catch(err) { showToast('Network error'); }
           });
         });
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
 
     document.getElementById('bl-add-btn')?.addEventListener('click', async () => {
       const type = document.getElementById('bl-type').value;
       const id = document.getElementById('bl-id').value.trim();
       const reason = document.getElementById('bl-reason').value.trim();
-      
       if (!id) return showToast('Discord ID is required');
-      
       try {
         const r = await fetch('/api/admin/blacklist', {
           method: 'POST',
@@ -630,56 +700,45 @@
           document.getElementById('bl-id').value = '';
           document.getElementById('bl-reason').value = '';
           loadBlacklist();
-        } else {
-          showToast(resData.error || 'Error adding entry');
-        }
-      } catch(err) {
-        showToast('Network error');
-      }
+        } else { showToast(resData.error || 'Error adding entry'); }
+      } catch(err) { showToast('Network error'); }
     });
 
-    // --- Logs Logic ---
     async function loadLogs() {
       const level = document.getElementById('log-level').value;
       try {
         const res = await fetch(`/api/admin/logs?level=${level}&limit=100`);
         if (!res.ok) return;
         const logs = await res.json();
-        
         const tbody = document.getElementById('logs-body');
         tbody.innerHTML = '';
-        
         if (logs.length === 0) {
           tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--text-muted); padding: 20px;">No logs found for this level.</td></tr>';
           return;
         }
-        
         logs.forEach(log => {
           const tr = document.createElement('tr');
           const date = new Date(log.timestamp);
           const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-          
           let colorClass = 'log-info';
           if (log.level === 'ERROR') colorClass = 'log-error';
           if (log.level === 'WARN') colorClass = 'log-warn';
-          
           tr.innerHTML = `
             <td style="color: var(--text-muted);">${timeStr}</td>
             <td class="${colorClass}" style="font-weight: 600;">${log.level}</td>
-            <td style="color: var(--text-main); white-space: pre-wrap; word-break: break-all;">${escapeHtml(log.message)}</td>
-          `;
+            <td style="color: var(--text-main); white-space: pre-wrap; word-break: break-all;">${escapeHtml(log.message)}</td>`;
           tbody.appendChild(tr);
         });
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
 
     document.getElementById('refresh-logs-btn')?.addEventListener('click', loadLogs);
     document.getElementById('log-level')?.addEventListener('change', loadLogs);
 
-loadBlacklist();
-loadLogs();
+    // Init
+    loadAdminData();
+    loadBlacklist();
+    loadLogs();
   </script>
 </body>
 </html>
