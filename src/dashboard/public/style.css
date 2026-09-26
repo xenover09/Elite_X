@@ -565,8 +565,7 @@ input, textarea, select { font-family: inherit; }
    ═══════════════════════════════════════════════════════════ */
 .dashboard-wrapper {
   display: flex;
-  height: calc(100vh - 80px);
-  overflow: hidden;
+  min-height: calc(100vh - 80px);
   background: var(--bg-body);
 }
 
@@ -577,6 +576,9 @@ input, textarea, select { font-family: inherit; }
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
   overflow-y: auto;
 }
 
@@ -664,7 +666,6 @@ input, textarea, select { font-family: inherit; }
 /* ── Main Content Area ──────────────────────────────────── */
 .main-content {
   flex: 1;
-  overflow-y: auto;
   background: var(--bg-base);
 }
 
