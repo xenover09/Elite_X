@@ -140,8 +140,8 @@
           : `<div class="guild-row-icon">${g.name.charAt(0)}</div>`;
           
         const actionHtml = g.botInGuild
-          ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`
-          : `<button class="btn btn-primary btn-sm">Invite</button>`;
+          ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>`
+          : `<button class="btn btn-primary btn-sm" style="padding: 6px 16px; font-weight: 600;">Invite</button>`;
           
         row.innerHTML = `
           <div class="guild-row-left">

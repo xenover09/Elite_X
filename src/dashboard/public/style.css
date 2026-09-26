@@ -735,8 +735,11 @@ input, textarea, select { font-family: inherit; }
 /* ═══════════════════════════════════════════════════════════
    SERVERS SCREEN (MY GUILDS)
    ═══════════════════════════════════════════════════════════ */
+#servers-screen {
+  background: var(--bg-surface);
+}
 .servers-container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 40px auto;
   padding: 0 20px;
 }
@@ -747,7 +750,7 @@ input, textarea, select { font-family: inherit; }
   margin-bottom: 24px;
 }
 .servers-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: var(--text-primary);
 }
@@ -778,9 +781,9 @@ input, textarea, select { font-family: inherit; }
   gap: 16px;
 }
 .guild-row-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
   background: var(--bg-card);
   object-fit: cover;
   display: flex;
@@ -790,7 +793,7 @@ input, textarea, select { font-family: inherit; }
   color: var(--text-secondary);
 }
 .guild-row-name {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
 }
