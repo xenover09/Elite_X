@@ -143,11 +143,38 @@
   }
 
   async function fetchAndRenderGuilds() {
-    guildsData = await api('/api/settings/guilds');
+    if (guildsListEl) {
+      guildsListEl.innerHTML = `
+        <div class="guild-row skeleton">
+          <div class="guild-row-left">
+            <div class="skeleton-circle"></div>
+            <div class="skeleton-text" style="width: 150px;"></div>
+          </div>
+        </div>
+        <div class="guild-row skeleton">
+          <div class="guild-row-left">
+            <div class="skeleton-circle"></div>
+            <div class="skeleton-text" style="width: 120px;"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    try {
+      guildsData = await api('/api/settings/guilds');
+    } catch (e) {
+      if (guildsListEl) guildsListEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">Failed to load guilds.</div>';
+      return;
+    }
+
     populateGuildSelect(guildsData);
     
     if (guildsListEl) {
       guildsListEl.innerHTML = '';
+      if (!guildsData || guildsData.length === 0) {
+        guildsListEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);"><h3 class="h3">No Guilds Found</h3><p>You need to join a server first.</p></div>';
+        return;
+      }
       guildsData.forEach(g => {
         const row = document.createElement('div');
         row.className = 'guild-row';
