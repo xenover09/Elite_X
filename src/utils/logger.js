@@ -12,6 +12,20 @@ const LEVELS = {
   debug: 'DEBUG',
 };
 
+const ringBuffer = [];
+const MAX_LOGS = 200;
+
+function pushToBuffer(entry) {
+  // Redact potential API keys (e.g. gsk_1234567890abcdef)
+  if (entry.message) {
+    entry.message = entry.message.replace(/gsk_[a-zA-Z0-9]{20,}/g, 'gsk_***[REDACTED]');
+  }
+  ringBuffer.push(entry);
+  if (ringBuffer.length > MAX_LOGS) {
+    ringBuffer.shift();
+  }
+}
+
 /**
  * Formats and writes a log entry to stdout/stderr.
  * @param {'info'|'warn'|'error'|'debug'} level
@@ -29,6 +43,7 @@ function log(level, message, ...args) {
       message,
       ...(args.length > 0 && { details: args }),
     };
+    pushToBuffer(entry);
     const output = JSON.stringify(entry);
     if (level === 'error') {
       process.stderr.write(output + '\n');
@@ -38,6 +53,7 @@ function log(level, message, ...args) {
   } else {
     const extra = args.length > 0 ? ' ' + args.map((a) => (typeof a === 'object' ? JSON.stringify(a) : a)).join(' ') : '';
     const line = `[${timestamp}] [${label}] ${message}${extra}`;
+    pushToBuffer({ timestamp, level: label, message: message + extra });
     if (level === 'error') {
       console.error(line);
     } else if (level === 'warn') {
@@ -55,6 +71,7 @@ const logger = {
   debug: (msg, ...args) => {
     if (process.env.DEBUG === 'true') log('debug', msg, ...args);
   },
+  getLogs: () => [...ringBuffer]
 };
 
 module.exports = logger;

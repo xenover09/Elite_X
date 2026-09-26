@@ -1,6 +1,7 @@
 const { Events } = require('discord.js');
 const { queryGroq } = require('../services/groqService');
 const { getState } = require('../store/panelState');
+const blacklist = require('../store/blacklist');
 const logger = require('../utils/logger');
 
 /**
@@ -31,6 +32,11 @@ module.exports = {
 
     // 2. Only handle guild messages (no DMs)
     if (!message.guild) return;
+
+    // 2.5. Check Blacklist
+    if (blacklist.isUserBlacklisted(message.author.id) || blacklist.isGuildBlacklisted(message.guild.id)) {
+      return;
+    }
 
     // 3. Determine if this message should trigger AI
     const isMention = message.mentions.has(client.user.id);

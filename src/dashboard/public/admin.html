@@ -309,7 +309,11 @@
       .header { padding: var(--space-2); }
       .container { padding: var(--space-4) var(--space-2); }
     }
-  </style>
+  
+    .log-error { color: #ef4444; }
+    .log-warn { color: #eab308; }
+    .log-info { color: var(--text-muted); }
+</style>
 </head>
 <body>
 
@@ -373,6 +377,66 @@
             <td><div class="skeleton skeleton-text short"></div></td>
             <td><div class="skeleton skeleton-text short"></div></td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Blacklist Section -->
+    <h2 style="margin-top: var(--space-5);">Global Blacklist</h2>
+    <div class="card" style="margin-bottom: var(--space-4);">
+      <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3); flex-wrap: wrap;">
+        <select id="bl-type" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;">
+          <option value="user">User ID</option>
+          <option value="guild">Server ID</option>
+        </select>
+        <input type="text" id="bl-id" placeholder="Discord ID (17-20 digits)" style="flex: 1; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;" />
+        <input type="text" id="bl-reason" placeholder="Reason (Optional)" style="flex: 2; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius); font-size: 13px;" />
+        <button class="btn btn-outline" id="bl-add-btn" style="border-color: var(--accent); color: var(--accent);">Add to Blacklist</button>
+      </div>
+
+      <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 80px;">Type</th>
+              <th>Discord ID</th>
+              <th>Reason</th>
+              <th>Date</th>
+              <th style="text-align: right; width: 100px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="blacklist-body">
+            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading blacklist...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Logs Section -->
+    <h2 style="margin-top: var(--space-5); display: flex; justify-content: space-between; align-items: center;">
+      System Error Logs
+      <div style="display: flex; gap: var(--space-2);">
+        <select id="log-level" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 4px 8px; border-radius: var(--radius); font-size: 12px;">
+          <option value="all">All Levels</option>
+          <option value="error" selected>Errors Only</option>
+          <option value="warn">Warnings</option>
+          <option value="info">Info</option>
+        </select>
+        <button class="btn btn-outline" id="refresh-logs-btn" style="padding: 4px 10px; font-size: 12px;">Refresh</button>
+      </div>
+    </h2>
+    <div class="table-container" style="max-height: 400px; overflow-y: auto; margin-bottom: var(--space-5);">
+      <table style="font-family: var(--font-mono); font-size: 12px;">
+        <thead>
+          <tr>
+            <th style="width: 160px;">Timestamp</th>
+            <th style="width: 80px;">Level</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody id="logs-body">
+          <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">Loading logs...</td></tr>
         </tbody>
       </table>
     </div>
@@ -480,6 +544,142 @@
     }
     
     loadAdminData();
+
+    // --- Blacklist Logic ---
+    async function loadBlacklist() {
+      try {
+        const res = await fetch('/api/admin/blacklist');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const tbody = document.getElementById('blacklist-body');
+        tbody.innerHTML = '';
+        
+        let hasEntries = false;
+        
+        const renderRow = (type, id, info) => {
+          hasEntries = true;
+          const tr = document.createElement('tr');
+          const d = new Date(info.date).toLocaleDateString();
+          tr.innerHTML = `
+            <td style="text-transform: capitalize; color: var(--text-muted);">${type}</td>
+            <td class="mono copy-id">${escapeHtml(id)}</td>
+            <td>${escapeHtml(info.reason)}</td>
+            <td class="tabular" style="color: var(--text-muted);">${d}</td>
+            <td style="text-align: right;">
+              <button class="btn btn-outline remove-bl-btn" data-type="${type}" data-id="${id}" style="padding: 4px 8px; font-size: 11px; color: #ef4444; border-color: rgba(239,68,68,0.3);">Remove</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        };
+        
+        if (data.user) Object.entries(data.user).forEach(([id, info]) => renderRow('user', id, info));
+        if (data.guild) Object.entries(data.guild).forEach(([id, info]) => renderRow('guild', id, info));
+        
+        if (!hasEntries) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">Koi blacklist entries nahi hain.</td></tr>';
+        }
+        
+        bindCopyEvents();
+        
+        document.querySelectorAll('.remove-bl-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const type = e.target.getAttribute('data-type');
+            const id = e.target.getAttribute('data-id');
+            if (!confirm(`Are you sure you want to remove ${type} ${id} from the blacklist?`)) return;
+            
+            try {
+              const r = await fetch('/api/admin/blacklist', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type, id })
+              });
+              const resData = await r.json();
+              if (resData.success) {
+                showToast(resData.message);
+                loadBlacklist();
+              } else {
+                showToast(resData.error || 'Error removing entry');
+              }
+            } catch(err) {
+              showToast('Network error');
+            }
+          });
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.getElementById('bl-add-btn')?.addEventListener('click', async () => {
+      const type = document.getElementById('bl-type').value;
+      const id = document.getElementById('bl-id').value.trim();
+      const reason = document.getElementById('bl-reason').value.trim();
+      
+      if (!id) return showToast('Discord ID is required');
+      
+      try {
+        const r = await fetch('/api/admin/blacklist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, id, reason })
+        });
+        const resData = await r.json();
+        if (resData.success) {
+          showToast(resData.message);
+          document.getElementById('bl-id').value = '';
+          document.getElementById('bl-reason').value = '';
+          loadBlacklist();
+        } else {
+          showToast(resData.error || 'Error adding entry');
+        }
+      } catch(err) {
+        showToast('Network error');
+      }
+    });
+
+    // --- Logs Logic ---
+    async function loadLogs() {
+      const level = document.getElementById('log-level').value;
+      try {
+        const res = await fetch(`/api/admin/logs?level=${level}&limit=100`);
+        if (!res.ok) return;
+        const logs = await res.json();
+        
+        const tbody = document.getElementById('logs-body');
+        tbody.innerHTML = '';
+        
+        if (logs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--text-muted); padding: 20px;">No logs found for this level.</td></tr>';
+          return;
+        }
+        
+        logs.forEach(log => {
+          const tr = document.createElement('tr');
+          const date = new Date(log.timestamp);
+          const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          
+          let colorClass = 'log-info';
+          if (log.level === 'ERROR') colorClass = 'log-error';
+          if (log.level === 'WARN') colorClass = 'log-warn';
+          
+          tr.innerHTML = `
+            <td style="color: var(--text-muted);">${timeStr}</td>
+            <td class="${colorClass}" style="font-weight: 600;">${log.level}</td>
+            <td style="color: var(--text-main); white-space: pre-wrap; word-break: break-all;">${escapeHtml(log.message)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.getElementById('refresh-logs-btn')?.addEventListener('click', loadLogs);
+    document.getElementById('log-level')?.addEventListener('change', loadLogs);
+
+loadBlacklist();
+loadLogs();
   </script>
 </body>
 </html>
