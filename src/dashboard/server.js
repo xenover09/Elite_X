@@ -50,11 +50,10 @@ function startDashboard(client) {
   // Session Middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || 'elite_bot_secret_xyz_123',
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: { 
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies if in production
-      sameSite: 'lax',
+      secure: false, // Railway handles TLS; setting false avoids trust-proxy header drops
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
   }));
