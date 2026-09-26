@@ -120,6 +120,15 @@ input, textarea, select { font-family: inherit; }
    LANDING PAGE
    ═══════════════════════════════════════════════════════════ */
 .landing-page {
+  /* Force Dark Theme Variables for Landing Page */
+  --bg-base:    #0f0f12;
+  --bg-surface: #18181c;
+  --bg-card:    #1f1f24;
+  --border:     #2e2e36;
+  --text-primary:   #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted:     #71717a;
+
   display: flex;
   flex-direction: column;
   min-height: 100vh;
