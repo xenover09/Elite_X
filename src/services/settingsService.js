@@ -12,6 +12,7 @@ function getSettings(guildId) {
   return { 
     aiEnabled: state.aiChat,
     aiChannel: state.aiChannel,
+    aiPersonality: state.aiPersonality || 'default',
     hasApiKey: isKeyPresent,
     aiApiKey: isKeyPresent ? 'gsk_••••••••••••' : '',
     amSpam: state.amSpam,

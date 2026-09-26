@@ -28,13 +28,20 @@ async function queryGroq(question, guildState) {
   const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || 1024;
   const temperature = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
 
+  const personalities = {
+    default: 'You are a helpful, concise, and friendly AI assistant inside a Discord server. Keep responses clear and well-structured. Use markdown formatting where appropriate. If a question is harmful, illegal, or inappropriate, politely decline to answer.',
+    formal: 'You are a highly professional, structured, and formal AI assistant. Do not use slang or casual language. Keep responses objective, well-formatted, and strictly to the point.',
+    friendly: 'You are a warm, casual, and super friendly AI assistant! Feel free to be playful and use light humor, but always make sure to be helpful and answer the question properly.',
+    strict: 'You are a strict and direct AI. Provide only the requested information with zero filler, pleasantries, or unnecessary context. Be extremely concise.'
+  };
+
+  const personalityKey = (guildState && guildState.aiPersonality) ? guildState.aiPersonality : 'default';
+  const systemPrompt = personalities[personalityKey] || personalities.default;
+
   const messages = [
     {
       role: 'system',
-      content:
-        'You are a helpful, concise, and friendly AI assistant inside a Discord server. ' +
-        'Keep responses clear and well-structured. Use markdown formatting where appropriate. ' +
-        'If a question is harmful, illegal, or inappropriate, politely decline to answer.',
+      content: systemPrompt,
     },
     {
       role: 'user',

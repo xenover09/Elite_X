@@ -41,6 +41,7 @@
   const aiStatusLabel     = $('#ai-status-label');
   const aiSettingsForm    = $('#ai-settings-form');
   const aiChannelSelect   = $('#ai-channel-select');
+  const aiPersonalitySelect = $('#ai-personality');
   const aiApiKeyInput     = $('#ai-api-key');
   const embedForm         = $('#embed-form');
   const addButtonRow      = $('#add-button-row');
@@ -341,6 +342,7 @@
     const data = await api(`/api/settings?guildId=${currentGuildId}`);
     setAIState(data.aiEnabled);
     if (aiChannelSelect) aiChannelSelect.value = data.aiChannel || '';
+    if (aiPersonalitySelect) aiPersonalitySelect.value = data.aiPersonality || 'default';
     if (aiApiKeyInput) aiApiKeyInput.value = data.aiApiKey || '';
     
     // AutoMod
@@ -382,6 +384,7 @@
       const payload = {
         guildId: currentGuildId,
         aiChannel: aiChannelSelect ? aiChannelSelect.value : '',
+        aiPersonality: aiPersonalitySelect ? aiPersonalitySelect.value : 'default',
         aiApiKey: aiApiKeyInput ? aiApiKeyInput.value : ''
       };
 
