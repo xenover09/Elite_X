@@ -10,7 +10,8 @@ const authMiddleware = require('../middleware/auth');
  * Returns current AI state.
  */
 router.get('/', authMiddleware, (req, res) => {
-  res.json(getSettings());
+  const { guildId } = req.query;
+  res.json(getSettings(guildId));
 });
 
 /**

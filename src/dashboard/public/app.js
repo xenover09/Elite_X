@@ -255,9 +255,9 @@
     
     await Promise.all([
       loadChannels(guildId),
-      loadRoles(guildId),
-      loadSettings()
+      loadRoles(guildId)
     ]);
+    await loadSettings();
   }
 
   async function loadChannels(guildId) {
@@ -547,7 +547,7 @@
   if (navDashboardBtn) {
     navDashboardBtn.addEventListener('click', () => {
       history.pushState({}, '', '/dashboard');
-      showScreen(currentGuildId ? 'dashboard' : 'servers');
+      showScreen('servers');
     });
   }
   
