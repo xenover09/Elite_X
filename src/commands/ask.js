@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { queryGroq } = require('../services/groqService');
 const { checkRateLimit } = require('../utils/rateLimit');
 const { sanitizeInput } = require('../utils/validation');
+const { getState } = require('../store/panelState');
 const logger = require('../utils/logger');
 
 module.exports = {
@@ -33,6 +34,36 @@ module.exports = {
       });
     }
 
+    const guildState = getState(interaction.guildId);
+
+    if (!guildState.aiChat) {
+      return interaction.reply({
+        content: '🔴 AI Chat is currently **disabled**. An administrator can enable it via the Dashboard.',
+        ephemeral: true,
+      });
+    }
+
+    if (!guildState.aiChannel) {
+      return interaction.reply({
+        content: '⚠️ **Setup Incomplete**: Please select an AI channel in the Dashboard before using the AI.',
+        ephemeral: true,
+      });
+    }
+
+    if (interaction.channelId !== guildState.aiChannel) {
+      return interaction.reply({
+        content: `⚠️ AI commands can only be used in <#${guildState.aiChannel}>.`,
+        ephemeral: true,
+      });
+    }
+
+    if (!guildState.aiApiKey) {
+      return interaction.reply({
+        content: '🔑 **Setup Incomplete**: You must provide your own Groq API key in the Dashboard to use the AI.',
+        ephemeral: true,
+      });
+    }
+
     // Rate limit check (per-user, separate from cooldown)
     const rateLimitResult = checkRateLimit(interaction.user.id);
     if (!rateLimitResult.allowed) {
@@ -46,7 +77,7 @@ module.exports = {
     await interaction.deferReply();
 
     try {
-      const aiResponse = await queryGroq(question);
+      const aiResponse = await queryGroq(question, guildState);
 
       const embed = new EmbedBuilder()
         .setColor(0x5865f2)

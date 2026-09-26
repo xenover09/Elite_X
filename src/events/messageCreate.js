@@ -50,10 +50,29 @@ module.exports = {
     }
 
     // 4.5. Check if AI is restricted to a specific channel
-    if (guildState.aiChannel && message.channel.id !== guildState.aiChannel) {
+    if (!guildState.aiChannel) {
+      if (isMention) {
+        return message.channel.send(
+          `<@${message.author.id}> ⚠️ **Setup Incomplete**: Please select an AI channel in the Dashboard before using the bot.`
+        );
+      }
+      return;
+    }
+
+    if (message.channel.id !== guildState.aiChannel) {
       if (isMention) {
         return message.channel.send(
           `<@${message.author.id}> ⚠️ AI can only be used in <#${guildState.aiChannel}>.`
+        );
+      }
+      return;
+    }
+
+    // 4.6. Check if API Key is provided
+    if (!guildState.aiApiKey) {
+      if (isMention) {
+        return message.channel.send(
+          `<@${message.author.id}> 🔑 **Setup Incomplete**: You must provide your own Groq API key in the Dashboard to use the AI.`
         );
       }
       return;

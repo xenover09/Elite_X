@@ -22,7 +22,7 @@ const state = new Map();
 function getState(guildId) {
   if (!state.has(guildId)) {
     state.set(guildId, { 
-      aiChat: true, 
+      aiChat: false, 
       autoMod: false,
       aiChannel: '',
       aiApiUrl: '',
