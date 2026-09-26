@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    Elite X — Dashboard Client Logic
-   Manual Admin Key Login · Secure Bearer Auth · Embed Builder
+   Secure Discord OAuth · AI Settings · Embed Builder
    ═══════════════════════════════════════════════════════════ */
 
 'use strict';

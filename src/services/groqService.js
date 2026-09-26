@@ -23,15 +23,6 @@ function getGroqClient() {
  * @returns {Promise<string>} The AI's response text.
  */
 async function queryGroq(question, guildState) {
-  let client;
-  if (guildState && guildState.aiApiKey) {
-    client = new Groq({ 
-      apiKey: guildState.aiApiKey || process.env.GROQ_API_KEY
-    });
-  } else {
-    client = getGroqClient();
-  }
-
   let model = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
 
   const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || 1024;
@@ -58,10 +49,6 @@ async function queryGroq(question, guildState) {
       let apiKey = guildState.aiApiKey || process.env.GROQ_API_KEY;
       if (apiKey) apiKey = apiKey.trim();
 
-      // DEBUG: see what kind of key the user is passing
-      const keyPrefix = apiKey ? apiKey.substring(0, 5) : 'EMPTY';
-      logger.info(`[DEBUG] Attempting AI with API key starting with: ${keyPrefix}`);
-
       // --- AUTO DETECT GOOGLE GEMINI KEY ---
       if (apiKey && (apiKey.startsWith('AIzaS') || apiKey.startsWith('AQ.'))) {
         const gModel = 'gemini-1.5-flash';
@@ -87,7 +74,7 @@ async function queryGroq(question, guildState) {
         const data = await response.json();
         text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       } 
-      // --- CUSTOM OPENAI COMPATIBLE ENDPOINT ---
+      // --- GROQ ENDPOINT ---
       else {
         let baseUrl = 'https://api.groq.com/openai/v1';
         if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
@@ -96,8 +83,7 @@ async function queryGroq(question, guildState) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'x-goog-api-key': apiKey
+            'Authorization': `Bearer ${apiKey}`
           },
           body: JSON.stringify({
             model,
