@@ -129,12 +129,15 @@ input, textarea, select { font-family: inherit; }
   --text-secondary: #a1a1aa;
   --text-muted:     #71717a;
 
-  display: flex;
+  display: none;
   flex-direction: column;
   min-height: 100vh;
   background: var(--bg-base);
   color: var(--text-primary);
   overflow-y: auto;
+}
+.landing-page.active {
+  display: flex;
 }
 
 /* Navbar */
