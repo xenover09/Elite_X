@@ -38,6 +38,11 @@ module.exports = {
       return;
     }
 
+    // 2.6. AutoMod Check
+    const automod = require('../automod/automod');
+    const wasPunished = await automod.check(message);
+    if (wasPunished) return;
+
     // 3. Determine if this message should trigger AI
     const isMention = message.mentions.has(client.user.id);
     const hasPrefix = message.content.toLowerCase().startsWith(AI_PREFIX);

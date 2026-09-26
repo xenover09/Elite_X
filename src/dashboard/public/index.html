@@ -278,6 +278,17 @@
                 <button class="nav-sub-btn" data-target="card-embed" style="display:none;"></button>
               </div>
 
+              
+              <!-- Module 4: AutoMod -->
+              <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.classList.add('hover-active')" onmouseout="this.classList.remove('hover-active')" onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-automod\']').click()">
+                <div class="card-icon card-icon-automod" style="margin: 0 auto 15px auto; background: rgba(250, 204, 21, 0.1); color: #facc15;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--text-primary);">AutoMod</h3>
+                <p class="text-muted" style="font-size: 0.9rem;">Configure spam and chat filters.</p>
+                <button class="nav-sub-btn" data-target="card-automod" style="display:none;"></button>
+              </div>
+
               <!-- Module 3 -->
               <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.classList.add('hover-active')" onmouseout="this.classList.remove('hover-active')" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;"  onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-clear\']').click()">
                 <div class="card-icon card-icon-clear" style="margin: 0 auto 15px auto;">
@@ -289,6 +300,66 @@
               </div>
 
             </div>
+          </section>
+
+          
+          <!-- Card: AutoMod -->
+          <section class="card tab-content" id="card-automod" style="overflow: visible;">
+            <button class="btn btn-sm btn-outline nav-sub-btn" data-target="card-manage" style="margin-bottom: 20px;">&larr; Back to Manage Server</button>
+            <div class="card-header">
+              <div class="card-icon" style="background: rgba(250, 204, 21, 0.1); color: #facc15;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              </div>
+              <div>
+                <h2>AutoMod Settings</h2>
+                <p class="card-desc">Automatically protect your server from spam and bad words.</p>
+              </div>
+            </div>
+            
+            <form id="automod-form" style="display: flex; flex-direction: column; gap: 20px;">
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary);">Spam Filter</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">Deletes 5+ messages sent within 5 seconds.</div>
+                </div>
+                <label class="switch"><input type="checkbox" id="am-spam"><span class="slider"></span></label>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary);">Mention Spam Filter</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">Deletes messages with 5 or more mentions.</div>
+                </div>
+                <label class="switch"><input type="checkbox" id="am-mentions"><span class="slider"></span></label>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary);">Caps Filter</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">Deletes messages consisting of 70%+ capital letters.</div>
+                </div>
+                <label class="switch"><input type="checkbox" id="am-caps"><span class="slider"></span></label>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary);">Bad Words Filter</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">Deletes messages containing offensive language.</div>
+                </div>
+                <label class="switch"><input type="checkbox" id="am-badwords"><span class="slider"></span></label>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary);">Invite Links Filter</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">Deletes discord.gg invite links.</div>
+                </div>
+                <label class="switch"><input type="checkbox" id="am-invites"><span class="slider"></span></label>
+              </div>
+              
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Save AutoMod Settings</button>
+            </form>
           </section>
 
           <!-- Card 1: Channel Lock/Unlock -->

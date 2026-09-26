@@ -1,42 +1,26 @@
 /**
  * In-memory state store for panel toggles.
  * Keyed by guildId so each server has independent state.
- *
- * Structure:
- * {
- *   [guildId]: {
- *     aiChat: boolean,
- *     autoMod: boolean,
- *   }
- * }
  */
-
-/** @type {Map<string, { aiChat: boolean, autoMod: boolean }>} */
 const state = new Map();
 
-/**
- * Returns the panel state for a guild, initializing defaults if needed.
- * @param {string} guildId
- * @returns {{ aiChat: boolean, autoMod: boolean }}
- */
 function getState(guildId) {
   if (!state.has(guildId)) {
     state.set(guildId, { 
       aiChat: false, 
-      autoMod: false,
       aiChannel: '',
-      aiApiKey: ''
+      aiApiKey: '',
+      aiPersonality: 'default', // For phase 3
+      amSpam: false,
+      amMentions: false,
+      amCaps: false,
+      amBadwords: false,
+      amInvites: false
     });
   }
   return state.get(guildId);
 }
 
-/**
- * Toggles a boolean feature for a guild and returns the new value.
- * @param {string} guildId
- * @param {'aiChat' | 'autoMod'} feature
- * @returns {boolean} New state after toggle.
- */
 function toggleFeature(guildId, feature) {
   const current = getState(guildId);
   current[feature] = !current[feature];
@@ -44,9 +28,6 @@ function toggleFeature(guildId, feature) {
   return current[feature];
 }
 
-/**
- * Updates advanced AI settings for a guild.
- */
 function updateAISettings(guildId, settings) {
   const current = getState(guildId);
   current.aiChannel = settings.aiChannel || '';
@@ -55,8 +36,22 @@ function updateAISettings(guildId, settings) {
   } else if (!settings.aiApiKey) {
     current.aiApiKey = '';
   }
+  if (settings.aiPersonality) {
+    current.aiPersonality = settings.aiPersonality;
+  }
   state.set(guildId, current);
   return current;
 }
 
-module.exports = { getState, toggleFeature, updateAISettings };
+function updateAutoModSettings(guildId, settings) {
+  const current = getState(guildId);
+  if (typeof settings.amSpam === 'boolean') current.amSpam = settings.amSpam;
+  if (typeof settings.amMentions === 'boolean') current.amMentions = settings.amMentions;
+  if (typeof settings.amCaps === 'boolean') current.amCaps = settings.amCaps;
+  if (typeof settings.amBadwords === 'boolean') current.amBadwords = settings.amBadwords;
+  if (typeof settings.amInvites === 'boolean') current.amInvites = settings.amInvites;
+  state.set(guildId, current);
+  return current;
+}
+
+module.exports = { getState, toggleFeature, updateAISettings, updateAutoModSettings };

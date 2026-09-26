@@ -13,7 +13,12 @@ function getSettings(guildId) {
     aiEnabled: state.aiChat,
     aiChannel: state.aiChannel,
     hasApiKey: isKeyPresent,
-    aiApiKey: isKeyPresent ? 'gsk_••••••••••••' : ''
+    aiApiKey: isKeyPresent ? 'gsk_••••••••••••' : '',
+    amSpam: state.amSpam,
+    amMentions: state.amMentions,
+    amCaps: state.amCaps,
+    amBadwords: state.amBadwords,
+    amInvites: state.amInvites
   };
 }
 
@@ -27,4 +32,6 @@ function toggleAI(guildId) {
   return { aiEnabled: newValue };
 }
 
-module.exports = { getSettings, toggleAI, updateAISettings };
+const { updateAutoModSettings } = require('../store/panelState');
+
+module.exports = { getSettings, toggleAI, updateAISettings, updateAutoModSettings };

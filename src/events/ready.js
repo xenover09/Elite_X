@@ -14,6 +14,10 @@ module.exports = {
     logger.info(`Bot is online as ${client.user.tag}`);
     logger.info(`Serving ${client.guilds.cache.size} guild(s)`);
 
+    // Register commands per-guild for instant propagation
+    const { registerAllGuilds } = require('../utils/slashRegister');
+    registerAllGuilds(client);
+
     const updatePresence = () => {
       client.user.setPresence({
         activities: [

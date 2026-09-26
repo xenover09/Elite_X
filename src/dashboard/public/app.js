@@ -342,6 +342,19 @@
     setAIState(data.aiEnabled);
     if (aiChannelSelect) aiChannelSelect.value = data.aiChannel || '';
     if (aiApiKeyInput) aiApiKeyInput.value = data.aiApiKey || '';
+    
+    // AutoMod
+    const amSpam = $('#am-spam');
+    const amMentions = $('#am-mentions');
+    const amCaps = $('#am-caps');
+    const amBadwords = $('#am-badwords');
+    const amInvites = $('#am-invites');
+    if (amSpam) amSpam.checked = data.amSpam || false;
+    if (amMentions) amMentions.checked = data.amMentions || false;
+    if (amCaps) amCaps.checked = data.amCaps || false;
+    if (amBadwords) amBadwords.checked = data.amBadwords || false;
+    if (amInvites) amInvites.checked = data.amInvites || false;
+
   }
 
   function setAIState(enabled) {
@@ -380,6 +393,33 @@
         toast('AI Settings saved successfully!', 'success');
       } catch (e) {
         toast(e.message || 'Failed to save AI settings', 'error');
+      }
+    });
+  }
+
+  
+  const automodForm = $('#automod-form');
+  if (automodForm) {
+    automodForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentGuildId) return toast('Select a server first', 'error');
+      
+      const payload = {
+        amSpam: $('#am-spam').checked,
+        amMentions: $('#am-mentions').checked,
+        amCaps: $('#am-caps').checked,
+        amBadwords: $('#am-badwords').checked,
+        amInvites: $('#am-invites').checked
+      };
+      
+      try {
+        await api('/api/settings/automod', {
+          method: 'POST',
+          body: payload
+        });
+        toast('AutoMod settings saved successfully!', 'success');
+      } catch (e) {
+        toast(e.message || 'Failed to save AutoMod settings', 'error');
       }
     });
   }
