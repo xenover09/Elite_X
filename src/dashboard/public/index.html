@@ -268,6 +268,17 @@
                 <button class="nav-sub-btn" data-target="card-lock" style="display:none;"></button>
               </div>
 
+              
+              <!-- Module 5: Reaction Roles -->
+              <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.classList.add('hover-active')" onmouseout="this.classList.remove('hover-active')" onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-reaction\']').click()">
+                <div class="card-icon card-icon-reaction" style="margin: 0 auto 15px auto; background: rgba(168, 85, 247, 0.1); color: #a855f7;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: var(--text-primary);">Reaction Roles</h3>
+                <p class="text-muted" style="font-size: 0.9rem;">Allow users to self-assign roles via reactions.</p>
+                <button class="nav-sub-btn" data-target="card-reaction" style="display:none;"></button>
+              </div>
+
               <!-- Module 2 -->
               <div class="card module-card" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.classList.add('hover-active')" onmouseout="this.classList.remove('hover-active')" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s, box-shadow 0.2s;"  onclick="document.querySelector('#card-manage .nav-sub-btn[data-target=\'card-embed\']').click()">
                 <div class="card-icon card-icon-embed-new" style="margin: 0 auto 15px auto;">
@@ -360,6 +371,68 @@
               
               <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Save AutoMod Settings</button>
             </form>
+          </section>
+
+          
+          <!-- Card: Reaction Roles -->
+          <section class="card tab-content" id="card-reaction" style="overflow: visible;">
+            <button class="btn btn-sm btn-outline nav-sub-btn" data-target="card-manage" style="margin-bottom: 20px;">&larr; Back to Manage Server</button>
+            <div class="card-header">
+              <div class="card-icon" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <h2>Reaction Roles</h2>
+                <p class="card-desc">Create messages where members can react to get roles.</p>
+              </div>
+            </div>
+            
+            <form id="reaction-role-form" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
+              <div class="form-group">
+                <label>Target Channel</label>
+                <select id="rr-channel-select" class="channel-select" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+                  <option value="" disabled selected>------- SELECT CHANNEL -------</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Message Content</label>
+                <textarea id="rr-content" placeholder="React to this message to get your roles!" rows="3" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary); font-family: var(--font-primary); resize: vertical;"></textarea>
+              </div>
+              
+              <div>
+                <label style="display: block; margin-bottom: 10px;">Emoji & Role Mappings (Max 10)</label>
+                <div id="rr-pairs-container" style="display: flex; flex-direction: column; gap: 10px;">
+                  <div class="rr-pair-row" style="display: flex; gap: 10px;">
+                    <input type="text" class="rr-emoji" placeholder="Emoji (e.g. 🔥)" required style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+                    <select class="rr-role-select" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+                      <option value="" disabled selected>Select a role...</option>
+                    </select>
+                    <button type="button" class="btn btn-outline rr-remove-btn" style="padding: 10px; color: #ef4444; border-color: rgba(239,68,68,0.3);">×</button>
+                  </div>
+                </div>
+                <button type="button" id="rr-add-pair-btn" class="btn btn-outline" style="margin-top: 10px; width: 100%; border-style: dashed;">+ Add another pair</button>
+              </div>
+              
+              <button type="submit" class="btn btn-primary" style="padding: 12px; margin-top: 10px; font-weight: 600;">Create Reaction Role Message</button>
+            </form>
+
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Active Mappings</h3>
+            <div style="background: var(--bg-body); border: 1px solid var(--border); border-radius: 8px; overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 600;">Channel</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 600;">Message ID</th>
+                    <th style="padding: 12px; color: var(--text-muted); font-weight: 600;">Pairs</th>
+                    <th style="padding: 12px; text-align: right; color: var(--text-muted); font-weight: 600;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="rr-list-body">
+                  <tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <!-- Card 1: Channel Lock/Unlock -->

@@ -293,6 +293,8 @@
       loadRoles(guildId)
     ]);
     await loadSettings();
+    await loadRRRoles();
+    await loadRRList();
   }
 
   async function loadChannels(guildId) {
@@ -423,6 +425,142 @@
         toast('AutoMod settings saved successfully!', 'success');
       } catch (e) {
         toast(e.message || 'Failed to save AutoMod settings', 'error');
+      }
+    });
+  }
+
+  
+  // --- Reaction Roles Logic ---
+  const rrForm = $('#reaction-role-form');
+  const rrPairsContainer = $('#rr-pairs-container');
+  const rrAddPairBtn = $('#rr-add-pair-btn');
+  const rrListBody = $('#rr-list-body');
+  
+  let currentGuildRoles = [];
+
+  // Update roles list on load
+  async function loadRRRoles() {
+    if (!currentGuildId) return;
+    try {
+      const roles = await api(`/api/settings/${currentGuildId}/roles`);
+      currentGuildRoles = roles.filter(r => r.id !== currentGuildId); // exclude @everyone
+      // Update all existing dropdowns
+      $('.rr-role-select').forEach(sel => populateRoleSelect(sel, sel.value));
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
+  function populateRoleSelect(selectEl, selectedVal = '') {
+    selectEl.innerHTML = '<option value="" disabled selected>Select a role...</option>';
+    currentGuildRoles.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = r.name;
+      selectEl.appendChild(opt);
+    });
+    if (selectedVal) selectEl.value = selectedVal;
+  }
+
+  if (rrAddPairBtn) {
+    rrAddPairBtn.addEventListener('click', () => {
+      if (rrPairsContainer.children.length >= 10) return toast('Max 10 pairs allowed', 'error');
+      const row = document.createElement('div');
+      row.className = 'rr-pair-row';
+      row.style.cssText = 'display: flex; gap: 10px;';
+      row.innerHTML = `
+        <input type="text" class="rr-emoji" placeholder="Emoji (e.g. 🔥)" required style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+        <select class="rr-role-select" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+          <option value="" disabled selected>Select a role...</option>
+        </select>
+        <button type="button" class="btn btn-outline rr-remove-btn" style="padding: 10px; color: #ef4444; border-color: rgba(239,68,68,0.3);">×</button>
+      `;
+      
+      populateRoleSelect(row.querySelector('.rr-role-select'));
+      row.querySelector('.rr-remove-btn').addEventListener('click', () => { row.remove(); });
+      rrPairsContainer.appendChild(row);
+    });
+  }
+  
+  // Attach remove to initial row
+  const initRemoveBtn = document.querySelector('.rr-remove-btn');
+  if (initRemoveBtn) {
+    initRemoveBtn.addEventListener('click', (e) => {
+      if (rrPairsContainer.children.length > 1) e.target.parentElement.remove();
+      else toast('At least one pair is required', 'error');
+    });
+  }
+
+  async function loadRRList() {
+    if (!currentGuildId) return;
+    try {
+      const list = await api(`/api/panel/reactionroles`);
+      rrListBody.innerHTML = '';
+      if (list.length === 0) {
+        rrListBody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">No active reaction roles.</td></tr>';
+        return;
+      }
+      
+      list.forEach(rr => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border)';
+        tr.innerHTML = `
+          <td style="padding: 12px; color: var(--text-primary);">#${rr.channelId}</td>
+          <td style="padding: 12px; font-family: monospace; color: var(--text-muted);">${rr.messageId}</td>
+          <td style="padding: 12px; color: var(--text-primary);">${rr.pairs.length} pairs</td>
+          <td style="padding: 12px; text-align: right;">
+            <button class="btn btn-sm btn-outline rr-del-btn" data-msg="${rr.messageId}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">Delete</button>
+          </td>
+        `;
+        rrListBody.appendChild(tr);
+      });
+      
+      $('.rr-del-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const msgId = e.target.getAttribute('data-msg');
+          if (!confirm('Delete this reaction role message mapping? (Will also attempt to delete the message in Discord)')) return;
+          try {
+            await api('/api/panel/reactionrole', {
+              method: 'DELETE',
+              body: { messageId: msgId }
+            });
+            toast('Deleted successfully', 'success');
+            loadRRList();
+          } catch(err) {
+            toast(err.message, 'error');
+          }
+        });
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if (rrForm) {
+    rrForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const channelId = $('#rr-channel-select').value;
+      const content = $('#rr-content').value.trim();
+      
+      const pairs = [];
+      $('.rr-pair-row').forEach(row => {
+        const emoji = row.querySelector('.rr-emoji').value.trim();
+        const roleId = row.querySelector('.rr-role-select').value;
+        if (emoji && roleId) pairs.push({ emoji, roleId });
+      });
+      
+      if (pairs.length === 0) return toast('Need at least one pair', 'error');
+      
+      try {
+        await api('/api/panel/reactionrole', {
+          method: 'POST',
+          body: { channelId, content, pairs }
+        });
+        toast('Reaction role created!', 'success');
+        $('#rr-content').value = '';
+        loadRRList();
+      } catch(err) {
+        toast(err.message, 'error');
       }
     });
   }

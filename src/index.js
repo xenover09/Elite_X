@@ -1,10 +1,11 @@
 require('dotenv').config();
 
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
 const { loadCommands } = require('./handlers/commandHandler');
 const { loadEvents } = require('./handlers/eventHandler');
 const { startDashboard } = require('./dashboard/server');
 const { init: initPanelService } = require('./services/panelService');
+const { initReactionRoleService } = require('./services/reactionRoleService');
 const logger = require('./utils/logger');
 
 // Validate required environment variables
@@ -28,7 +29,9 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions
   ],
+  partials: [Partials.Message, Partials.Reaction, Partials.User],
 });
 // Attach collections to client
 client.commands = new Collection();
@@ -38,8 +41,9 @@ client.cooldowns = new Collection();
 loadCommands(client);
 loadEvents(client);
 
-// Give panel service access to the Discord client
+// Give services access to the Discord client
 initPanelService(client);
+initReactionRoleService(client);
 
 // Start the dashboard (Dashboard server IS the HTTP server)
 startDashboard(client);

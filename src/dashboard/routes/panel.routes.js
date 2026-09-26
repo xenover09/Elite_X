@@ -102,4 +102,54 @@ router.post('/clear', authMiddleware, guildAuthMiddleware, async (req, res) => {
   }
 });
 
+const { getGuildReactionRoles } = require('../../store/reactionRoles');
+const { createReactionRoleMessage, deleteReactionRoleMessage } = require('../../services/reactionRoleService');
+
+/**
+ * POST /api/panel/reactionrole
+ */
+router.post('/reactionrole', authMiddleware, guildAuthMiddleware, async (req, res) => {
+  const guildId = req.targetGuildId;
+  const { channelId, content, pairs } = req.body;
+  if (!channelId || !content || !pairs || !Array.isArray(pairs)) {
+    return res.status(400).json({ error: "Missing parameters" });
+  }
+
+  try {
+    const result = await createReactionRoleMessage(guildId, { channelId, content, pairs });
+    res.json({ success: true, messageId: result.messageId });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/panel/reactionroles
+ */
+router.get('/reactionroles', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
+  const roles = getGuildReactionRoles(guildId);
+  const result = [];
+  for (const [messageId, data] of roles.entries()) {
+    result.push({ messageId, channelId: data.channelId, pairs: data.pairs });
+  }
+  res.json(result);
+});
+
+/**
+ * DELETE /api/panel/reactionrole
+ */
+router.delete('/reactionrole', authMiddleware, guildAuthMiddleware, async (req, res) => {
+  const guildId = req.targetGuildId;
+  const { messageId } = req.body;
+  if (!messageId) return res.status(400).json({ error: "Missing messageId" });
+
+  try {
+    await deleteReactionRoleMessage(guildId, messageId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;
