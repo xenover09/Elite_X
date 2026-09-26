@@ -1543,8 +1543,8 @@ h1, h2, h3, h4 {
 }
 
 input:checked + .slider {
-  background-color: var(--accent);
-  border-color: var(--accent);
+  background-color: #22c55e;
+  border-color: #22c55e;
 }
 
 input:checked + .slider:before {

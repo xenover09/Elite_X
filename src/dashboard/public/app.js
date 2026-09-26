@@ -369,12 +369,13 @@
   }
 
   function setAIState(enabled) {
-    aiToggleBtn.classList.toggle('active', enabled);
+    aiToggleBtn.checked = enabled;
     aiStatusLabel.textContent = enabled ? 'AI Status: Online' : 'AI Status: Offline';
-    aiStatusLabel.className = 'ai-status-label ' + (enabled ? 'on' : 'off');
+    aiStatusLabel.style.color = enabled ? '#22c55e' : 'var(--text-muted)';
   }
 
-  aiToggleBtn.addEventListener('click', async () => {
+  aiToggleBtn.addEventListener('change', async (e) => {
+    e.preventDefault(); // Prevent UI from toggling before API confirms
     if (!currentGuildId) return;
     try {
       const data = await api('/api/settings/toggle', { method: 'POST', body: { guildId: currentGuildId } });

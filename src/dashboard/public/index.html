@@ -613,11 +613,12 @@
               </div>
               <h2 class="card-title">AI System Configuration</h2>
             </div>
-            <div class="ai-toggle-row">
-              <span id="ai-status-label" class="ai-status-label">Loading…</span>
-              <button id="ai-toggle-btn" class="toggle-switch" disabled>
-                <span class="toggle-knob"></span>
-              </button>
+            <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
+              <div>
+                <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary);">Enable AI System</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);" id="ai-status-label">Toggle whether the AI bot should reply.</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="ai-toggle-btn"><span class="slider"></span></label>
             </div>
             
             <hr style="border: 1px solid var(--border); margin: 20px 0;">
