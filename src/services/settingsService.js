@@ -11,9 +11,7 @@ function getSettings(guildId) {
   return { 
     aiEnabled: state.aiChat,
     aiChannel: state.aiChannel,
-    aiApiUrl: state.aiApiUrl,
-    aiApiKey: state.aiApiKey,
-    aiModel: state.aiModel
+    aiApiKey: state.aiApiKey
   };
 }
 

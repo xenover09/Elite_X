@@ -27,12 +27,12 @@ router.post('/toggle', authMiddleware, (req, res) => {
 
 /**
  * POST /api/settings/ai
- * Updates Advanced AI settings (channel, api url, api key, model).
+ * Updates Advanced AI settings (channel, api key).
  */
 router.post('/ai', authMiddleware, (req, res) => {
-  const { guildId, aiChannel, aiApiUrl, aiApiKey, aiModel } = req.body;
+  const { guildId, aiChannel, aiApiKey } = req.body;
   if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
-  const result = updateAISettings(guildId, { aiChannel, aiApiUrl, aiApiKey, aiModel });
+  const result = updateAISettings(guildId, { aiChannel, aiApiKey });
   res.json(result);
 });
 

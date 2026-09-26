@@ -41,9 +41,7 @@
   const aiStatusLabel     = $('#ai-status-label');
   const aiSettingsForm    = $('#ai-settings-form');
   const aiChannelSelect   = $('#ai-channel-select');
-  const aiApiUrlInput     = $('#ai-api-url');
   const aiApiKeyInput     = $('#ai-api-key');
-  const aiModelInput      = $('#ai-model');
   const embedForm         = $('#embed-form');
   const addButtonRow      = $('#add-button-row');
   const buttonsContainer  = $('#buttons-container');
@@ -316,9 +314,7 @@
     const data = await api(`/api/settings?guildId=${currentGuildId}`);
     setAIState(data.aiEnabled);
     if (aiChannelSelect) aiChannelSelect.value = data.aiChannel || '';
-    if (aiApiUrlInput) aiApiUrlInput.value = data.aiApiUrl || '';
     if (aiApiKeyInput) aiApiKeyInput.value = data.aiApiKey || '';
-    if (aiModelInput) aiModelInput.value = data.aiModel || '';
   }
 
   function setAIState(enabled) {
@@ -346,9 +342,7 @@
       const payload = {
         guildId: currentGuildId,
         aiChannel: aiChannelSelect ? aiChannelSelect.value : '',
-        aiApiUrl: aiApiUrlInput ? aiApiUrlInput.value : '',
-        aiApiKey: aiApiKeyInput ? aiApiKeyInput.value : '',
-        aiModel: aiModelInput ? aiModelInput.value : ''
+        aiApiKey: aiApiKeyInput ? aiApiKeyInput.value : ''
       };
 
       try {

@@ -24,19 +24,15 @@ function getGroqClient() {
  */
 async function queryGroq(question, guildState) {
   let client;
-  if (guildState && (guildState.aiApiKey || guildState.aiApiUrl)) {
+  if (guildState && guildState.aiApiKey) {
     client = new Groq({ 
-      apiKey: guildState.aiApiKey || process.env.GROQ_API_KEY,
-      baseURL: guildState.aiApiUrl || undefined
+      apiKey: guildState.aiApiKey || process.env.GROQ_API_KEY
     });
   } else {
     client = getGroqClient();
   }
 
   let model = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
-  if (guildState && guildState.aiModel) {
-    model = guildState.aiModel.trim();
-  }
 
   const maxTokens = parseInt(process.env.AI_MAX_TOKENS, 10) || 1024;
   const temperature = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
@@ -58,7 +54,7 @@ async function queryGroq(question, guildState) {
   let text = '';
 
   try {
-    if (guildState && (guildState.aiApiKey || guildState.aiApiUrl)) {
+    if (guildState && guildState.aiApiKey) {
       let apiKey = guildState.aiApiKey || process.env.GROQ_API_KEY;
       if (apiKey) apiKey = apiKey.trim();
 
@@ -68,7 +64,7 @@ async function queryGroq(question, guildState) {
 
       // --- AUTO DETECT GOOGLE GEMINI KEY ---
       if (apiKey && (apiKey.startsWith('AIzaS') || apiKey.startsWith('AQ.'))) {
-        const gModel = (guildState && guildState.aiModel) ? guildState.aiModel.trim() : 'gemini-1.5-flash';
+        const gModel = 'gemini-1.5-flash';
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${gModel}:generateContent?key=${apiKey}`;
         const response = await fetch(geminiUrl, {
           method: 'POST',
@@ -93,7 +89,7 @@ async function queryGroq(question, guildState) {
       } 
       // --- CUSTOM OPENAI COMPATIBLE ENDPOINT ---
       else {
-        let baseUrl = guildState.aiApiUrl || 'https://api.groq.com/openai/v1';
+        let baseUrl = 'https://api.groq.com/openai/v1';
         if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
         
         const response = await fetch(`${baseUrl}/chat/completions`, {

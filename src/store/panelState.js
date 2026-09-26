@@ -25,9 +25,7 @@ function getState(guildId) {
       aiChat: false, 
       autoMod: false,
       aiChannel: '',
-      aiApiUrl: '',
-      aiApiKey: '',
-      aiModel: ''
+      aiApiKey: ''
     });
   }
   return state.get(guildId);
@@ -52,9 +50,7 @@ function toggleFeature(guildId, feature) {
 function updateAISettings(guildId, settings) {
   const current = getState(guildId);
   current.aiChannel = settings.aiChannel || '';
-  current.aiApiUrl = settings.aiApiUrl || '';
   current.aiApiKey = settings.aiApiKey || '';
-  current.aiModel = settings.aiModel || '';
   state.set(guildId, current);
   return current;
 }
