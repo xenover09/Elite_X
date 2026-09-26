@@ -152,6 +152,9 @@ input, textarea, select { font-family: inherit; }
   top: 0;
   z-index: 100;
 }
+body.is-logged-in .landing-nav {
+  display: none !important;
+}
 .landing-logo {
   display: flex;
   align-items: center;

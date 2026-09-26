@@ -83,11 +83,14 @@
       const data = await res.json();
       
       if (data.authenticated) {
-        // If authenticated, change the "Log in" button on the landing page to "Dashboard"
-        const loginLink = document.querySelector('.landing-nav-links a[href="/auth/discord"]');
-        if (loginLink) {
-          loginLink.textContent = 'Dashboard';
-          loginLink.href = '/dashboard';
+        document.body.classList.add('is-logged-in');
+        
+        // Populate Topbar User Info for both Landing Page and Dashboard
+        if (userAvatar) userAvatar.src = data.user.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
+        if (userName) userName.textContent = data.user.global_name || data.user.username;
+        if (topbarBotLogo) {
+          topbarBotLogo.src = 'logo.jpg';
+          topbarBotLogo.style.display = 'block';
         }
 
         // Only show dashboard if they are actually on /dashboard or another sub-route.
@@ -98,7 +101,8 @@
           await loadDashboard(data.user);
         }
       } else {
-        // Not authenticated: always show landing page, but ensure it points to login
+        // Not authenticated: always show landing page
+        document.body.classList.remove('is-logged-in');
         showScreen('login');
       }
     } catch (e) {
@@ -112,7 +116,8 @@
     if (serversScreen) serversScreen.classList.toggle('active', name === 'servers');
     
     if (topbar) {
-      topbar.style.display = name === 'login' ? 'none' : 'flex';
+      const isLoggedIn = document.body.classList.contains('is-logged-in');
+      topbar.style.display = (name === 'login' && !isLoggedIn) ? 'none' : 'flex';
     }
   }
 
@@ -120,17 +125,8 @@
     try {
       showScreen('servers');
       
-      // Fetch bot info for logo
+      // Fetch bot info for later use
       healthData = await api('/api/health');
-      if (topbarBotLogo) {
-        topbarBotLogo.src = 'logo.jpg';
-        topbarBotLogo.style.display = 'block';
-      }
-
-      if (user) {
-        userAvatar.src = user.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
-        userName.textContent = user.global_name || user.username;
-      }
       
       await fetchAndRenderGuilds();
     } catch (e) {
