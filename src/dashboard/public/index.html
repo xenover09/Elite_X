@@ -201,10 +201,19 @@
             <span>Manage Server</span>
           </button>
           <div class="nav-divider"></div>
+          
           <button class="nav-item" data-tab="card-ai">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 014 4v1a4 4 0 01-8 0V6a4 4 0 014-4z"/><path d="M16 11a4 4 0 01-8 0"/><line x1="12" y1="15" x2="12" y2="19"/><path d="M8 19h8"/></svg>
             <span>AI Settings</span>
           </button>
+          
+          <div class="nav-divider"></div>
+          
+          <button class="nav-item" data-tab="card-security">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Security Audit</span>
+          </button>
+
         </nav>
       </aside>
 
@@ -636,6 +645,39 @@
           </section>
 
 
+
+        
+          <!-- Card: Security Audit -->
+          <section class="card tab-content" id="card-security">
+            <div class="card-header">
+              <div class="card-icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h2 class="card-title">Server Security Audit</h2>
+            </div>
+            
+            <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 30px; background: var(--bg-body); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+              <div style="position: relative; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #fff;" id="audit-score-circle">
+                <div style="position: absolute; width: 80px; height: 80px; background: var(--bg-body); border-radius: 50%;"></div>
+                <span style="position: relative; z-index: 1;" id="audit-score">--</span>
+              </div>
+              <div style="flex: 1;">
+                <h3 style="font-size: 1.5rem; margin-bottom: 5px; color: var(--text-primary);" id="audit-risk">Run Audit</h3>
+                <p style="color: var(--text-muted); margin-bottom: 10px;">Nuke Risk: <strong id="audit-nuke">--</strong></p>
+                <button class="btn btn-outline" id="run-audit-btn" style="font-weight: 600;">Re-scan Server</button>
+              </div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-primary);">Security Findings</h3>
+            <div id="audit-findings" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
+              <div style="padding: 20px; text-align: center; color: var(--text-muted); background: var(--bg-body); border-radius: 8px; border: 1px solid var(--border);">Run a scan to see findings.</div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-primary);">Strong Points</h3>
+            <ul id="audit-strengths" style="padding-left: 20px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;">
+              <li>Run a scan to see strong points.</li>
+            </ul>
+          </section>
 
         </main>
       </div>

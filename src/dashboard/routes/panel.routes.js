@@ -152,4 +152,24 @@ router.delete('/reactionrole', authMiddleware, guildAuthMiddleware, async (req, 
   }
 });
 
+const { runSecurityAudit } = require('../../services/securityAudit');
+
+/**
+ * GET /api/panel/security-audit
+ */
+router.get('/security-audit', authMiddleware, guildAuthMiddleware, async (req, res) => {
+  const guildId = req.targetGuildId;
+  const client = req.app.get('discordClient');
+  const guild = client.guilds.cache.get(guildId);
+  
+  if (!guild) return res.status(404).json({ error: 'Guild not found' });
+  
+  try {
+    const result = await runSecurityAudit(guild);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;
