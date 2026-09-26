@@ -158,4 +158,22 @@ async function clearChat(channelId) {
   return newChannel.id;
 }
 
-module.exports = { init, sendPanel, lockChannel, clearChat };
+/**
+ * Unlocks a channel by resetting ViewChannel and SendMessages for @everyone.
+ * 
+ * @param {string} channelId
+ * @returns {Promise<void>}
+ */
+async function unlockChannel(channelId) {
+  if (!discordClient) throw new Error('Client not initialized.');
+  const channel = await discordClient.channels.fetch(channelId);
+  if (!channel || !channel.isTextBased()) throw new Error('Invalid channel.');
+
+  await channel.permissionOverwrites.edit(channel.guild.id, {
+    ViewChannel: null,
+    SendMessages: null
+  });
+  logger.info(`Channel ${channelId} unlocked`);
+}
+
+module.exports = { init, sendPanel, lockChannel, unlockChannel, clearChat };

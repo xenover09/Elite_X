@@ -317,7 +317,10 @@
                 </div>
               </div>
             </div>
-            <button id="lock-btn" class="btn btn-blue btn-full mt-20">Set Permissions</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button id="lock-btn" class="btn btn-blue btn-full" style="margin-top: 0;">Lock (Set Permissions)</button>
+              <button id="unlock-btn" class="btn btn-outline btn-full" style="margin-top: 0; background-color: transparent; border: 1px solid var(--accent); color: var(--accent);">Unlock Channel</button>
+            </div>
           </section>
 
           <!-- Card 2: Send Advanced Embed -->
@@ -330,7 +333,9 @@
               <h2 class="card-title" style="color: var(--text-primary);">Send Advanced Embed</h2>
             </div>
             <p class="card-desc">Send advanced embeds for pricing, rules, or announcements.</p>
-            <form id="embed-form" class="embed-form">
+            <div style="display: flex; gap: 30px; flex-wrap: wrap; margin-top: 20px;">
+              <div style="flex: 1; min-width: 300px;">
+                <form id="embed-form" class="embed-form">
               <div class="form-group">
                 <label>Select Channel:</label>
                 <select id="embed-channel" class="channel-select">
@@ -369,6 +374,18 @@
 
               <button type="submit" class="btn btn-cyan btn-full mt-20">Send Embed Message</button>
             </form>
+            </div>
+            
+            <div style="flex: 1; min-width: 300px;">
+              <h3 style="margin-bottom: 15px; color: var(--text-secondary); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px;">Live Preview</h3>
+              <div id="embed-preview" style="background: #2b2d31; border-left: 4px solid #00bfff; padding: 16px; border-radius: 4px; display: flex; flex-direction: column;">
+                <div id="preview-title" style="color: #ffffff; font-weight: 600; font-size: 1rem; margin-bottom: 8px; min-height: 20px;"></div>
+                <div id="preview-desc" style="color: #dbdee1; font-size: 0.875rem; white-space: pre-wrap; margin-bottom: 15px; line-height: 1.4; min-height: 20px;"></div>
+                <img id="preview-image" style="max-width: 100%; border-radius: 4px; display: none; margin-bottom: 15px;" src="">
+                <div id="preview-buttons" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+              </div>
+            </div>
+          </div>
           </section>
 
           <!-- Card 3: Clear Chat (Clone Method) -->
@@ -417,12 +434,24 @@
               </div>
               
               <div class="form-group mt-15">
+                <label>API Base URL (Optional):</label>
+                <input type="url" id="ai-api-url" placeholder="https://api.groq.com/openai/v1">
+                <small class="text-muted">Override the default AI API endpoint.</small>
+              </div>
+
+              <div class="form-group mt-15">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                  <label style="margin-bottom: 0;">Groq API Key (Optional):</label>
+                  <label style="margin-bottom: 0;">API Key (Optional):</label>
                   <a href="https://console.groq.com/" target="_blank" style="color: var(--accent); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Get API Key &nearr;</a>
                 </div>
                 <input type="password" id="ai-api-key" placeholder="gsk_...">
                 <small class="text-muted">Provide your own key to override the default bot API key.</small>
+              </div>
+
+              <div class="form-group mt-15">
+                <label>AI Model (Optional):</label>
+                <input type="text" id="ai-model" placeholder="llama-3.1-70b-versatile">
+                <small class="text-muted">Specify a custom model name to use.</small>
               </div>
               
               <button type="submit" class="btn btn-primary mt-20">Save AI Settings</button>

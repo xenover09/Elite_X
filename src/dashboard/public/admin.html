@@ -179,12 +179,22 @@
   </main>
 
   <script>
+    function escapeHtml(unsafe) {
+      return (unsafe || '').toString()
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+    }
+
     async function loadAdminData() {
       try {
         const res = await fetch('/api/admin/stats');
         
         if (res.status === 401 || res.status === 403) {
-          alert('Access Denied. You are not the Developer (ADMIN_ID mismatch). Redirecting...');
+          const errData = await res.json().catch(()=>({}));
+          alert(errData.error || 'Access Denied. You are not the Developer (ADMIN_ID mismatch). Redirecting...');
           window.location.href = '/dashboard';
           return;
         }
@@ -200,12 +210,13 @@
         data.guilds.sort((a, b) => b.memberCount - a.memberCount).forEach(g => {
           const tr = document.createElement('tr');
           const date = new Date(g.joinedAt).toLocaleDateString();
+          const escapedName = escapeHtml(g.name);
           const iconHtml = g.icon 
             ? `<img src="${g.icon}" class="guild-icon-sm">`
-            : `<div class="guild-icon-sm" style="background: var(--bg-hover); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">${g.name.charAt(0)}</div>`;
+            : `<div class="guild-icon-sm" style="background: var(--bg-hover); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">${escapedName.charAt(0)}</div>`;
             
           tr.innerHTML = `
-            <td>${iconHtml} ${g.name}</td>
+            <td>${iconHtml} ${escapedName}</td>
             <td style="font-family: monospace; color: var(--text-secondary);">${g.id}</td>
             <td><strong>${g.memberCount}</strong></td>
             <td style="font-family: monospace; color: var(--text-secondary);">${g.ownerId}</td>

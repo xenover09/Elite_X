@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const queueService = require('../../services/queueService');
-const { sendPanel, lockChannel, clearChat } = require('../../services/panelService');
+const { sendPanel, lockChannel, unlockChannel, clearChat } = require('../../services/panelService');
 const authMiddleware = require('../middleware/auth');
 
 const multer = require('multer');
@@ -64,6 +64,22 @@ router.post('/lock', authMiddleware, async (req, res) => {
   try {
     await lockChannel({ channelId, roleIds });
     res.json({ success: true, message: "Channel locked successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * POST /api/panel/unlock
+ * Unlocks a channel by resetting everyone role permissions.
+ */
+router.post('/unlock', authMiddleware, async (req, res) => {
+  const { channelId } = req.body;
+  if (!channelId) return res.status(400).json({ error: "channelId is required" });
+
+  try {
+    await unlockChannel(channelId);
+    res.json({ success: true, message: "Channel unlocked successfully" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

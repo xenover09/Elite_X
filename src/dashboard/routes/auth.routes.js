@@ -19,7 +19,7 @@ router.get('/discord', (req, res, next) => {
  */
 router.get('/invite', (req, res) => {
   const clientId = process.env.CLIENT_ID || process.env.DISCORD_CLIENT_ID;
-  res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`);
+  res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=2147576848&scope=bot%20applications.commands`);
 });
 
 /**

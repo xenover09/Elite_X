@@ -4,8 +4,9 @@ const express = require('express');
 const router = express.Router();
 
 function adminMiddleware(req, res, next) {
-  if (!req.isAuthenticated()) return res.status(401).json({ error: 'Unauthorized' });
-  if (req.user.id !== process.env.ADMIN_ID) return res.status(403).json({ error: 'Forbidden: Admins only' });
+  if (!req.isAuthenticated()) return res.status(401).json({ error: 'Unauthorized: Aapne dashboard par login nahi kiya hua! Pehle login karein.' });
+  const adminId = process.env.ADMIN_ID || '1156595473126273045';
+  if (req.user.id !== adminId) return res.status(403).json({ error: `Access Denied: Aapki logged-in Discord ID (${req.user.id}) ADMIN_ID se match nahi kar rahi.` });
   next();
 }
 

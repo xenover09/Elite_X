@@ -5,11 +5,18 @@
 
 'use strict';
 
-'use strict';
-
 (() => {
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
+
+  function escapeHtml(unsafe) {
+    return (unsafe || '').toString()
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+  }
 
   const loginScreen       = $('#login-screen');
   const dashScreen        = $('#dashboard-screen');
@@ -147,9 +154,11 @@
         const row = document.createElement('div');
         row.className = 'guild-row';
         
+        const escapedName = escapeHtml(g.name);
+        
         const iconHtml = g.icon 
           ? `<img src="${g.icon}" class="guild-row-icon">`
-          : `<div class="guild-row-icon">${g.name.charAt(0)}</div>`;
+          : `<div class="guild-row-icon">${escapedName.charAt(0)}</div>`;
           
         const actionHtml = g.botInGuild
           ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>`
@@ -158,7 +167,7 @@
         row.innerHTML = `
           <div class="guild-row-left">
             ${iconHtml}
-            <div class="guild-row-name">${g.name}</div>
+            <div class="guild-row-name">${escapedName}</div>
           </div>
           <div class="guild-row-right">
             ${actionHtml}
@@ -168,7 +177,7 @@
         row.addEventListener('click', (e) => {
           if (!g.botInGuild) {
             const cid = (healthData && healthData.clientId) ? healthData.clientId : 'YOUR_CLIENT_ID';
-            window.open(`https://discord.com/api/oauth2/authorize?client_id=${cid}&permissions=8&scope=bot%20applications.commands`, '_blank');
+            window.open(`https://discord.com/api/oauth2/authorize?client_id=${cid}&permissions=2147576848&scope=bot%20applications.commands`, '_blank');
             return;
           }
           guildSelect.value = g.id;
@@ -190,11 +199,11 @@
       opt.textContent = g.name;
       guildSelect.appendChild(opt);
     });
-    
+    const activeGuilds = guilds.filter(g => g.botInGuild);
     // Auto-select if only 1 guild
-    if (guilds.length === 1) {
-      guildSelect.value = guilds[0].id;
-      selectGuild(guilds[0].id);
+    if (activeGuilds.length === 1) {
+      guildSelect.value = activeGuilds[0].id;
+      selectGuild(activeGuilds[0].id);
     }
   }
 
@@ -293,7 +302,7 @@
         div.className = 'role-item';
         div.innerHTML = `
           <input type="checkbox" class="role-checkbox" id="role-${role.id}" value="${role.id}">
-          <label for="role-${role.id}">${role.name}</label>
+          <label for="role-${role.id}">${escapeHtml(role.name)}</label>
         `;
         container.appendChild(div);
       });
@@ -357,6 +366,52 @@
   // ─── Panel Actions ───────────────────────────────────
 
   // 1. Send Embed
+  
+  const embedTitle = $('#embed-title');
+  const embedDesc = $('#embed-desc');
+  const embedColor = $('#embed-color');
+  const embedFileInput = $('#embed-file-input');
+  const previewBox = $('#embed-preview');
+  const previewTitle = $('#preview-title');
+  const previewDesc = $('#preview-desc');
+  const previewImage = $('#preview-image');
+  const previewButtons = $('#preview-buttons');
+
+  function updatePreview() {
+    if (!previewBox) return;
+    previewBox.style.borderLeftColor = embedColor.value || '#00bfff';
+    previewTitle.textContent = embedTitle.value || 'Title...';
+    previewDesc.textContent = embedDesc.value || 'Description...';
+    
+    if (embedFileInput.files && embedFileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewImage.style.display = 'block';
+      };
+      reader.readAsDataURL(embedFileInput.files[0]);
+    } else {
+      previewImage.style.display = 'none';
+      previewImage.src = '';
+    }
+
+    previewButtons.innerHTML = '';
+    $$('.button-config-row').forEach(row => {
+      const label = row.querySelector('.btn-label').value;
+      if (label) {
+        const btn = document.createElement('div');
+        btn.style = 'background: #4f545c; color: white; padding: 6px 16px; border-radius: 3px; font-size: 0.85rem; font-weight: 500; display: inline-block;';
+        btn.textContent = label;
+        previewButtons.appendChild(btn);
+      }
+    });
+  }
+
+  if (embedTitle) embedTitle.addEventListener('input', updatePreview);
+  if (embedDesc) embedDesc.addEventListener('input', updatePreview);
+  if (embedColor) embedColor.addEventListener('input', updatePreview);
+  if (embedFileInput) embedFileInput.addEventListener('change', updatePreview);
+  
   addButtonRow.addEventListener('click', () => {
     if (buttonsContainer.children.length >= 5) return toast('Max 5 buttons allowed', 'error');
     const div = document.createElement('div');
@@ -366,9 +421,14 @@
       <input type="url" placeholder="URL" class="btn-url">
       <button type="button" class="btn-remove">×</button>
     `;
-    div.querySelector('.btn-remove').onclick = () => div.remove();
+    div.querySelector('.btn-label').addEventListener('input', updatePreview);
+    div.querySelector('.btn-remove').onclick = () => { div.remove(); updatePreview(); };
     buttonsContainer.appendChild(div);
+    updatePreview();
   });
+  
+  // Initialize preview
+  setTimeout(updatePreview, 100);
 
   embedForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -436,6 +496,27 @@
     }
   });
 
+  const unlockBtn = $('#unlock-btn');
+  if (unlockBtn) {
+    unlockBtn.addEventListener('click', async () => {
+      if (!currentGuildId) return toast('Select a server first', 'error');
+      const channelId = $('#card-lock .channel-select').value;
+      if (!channelId) return toast('Select a channel to unlock', 'error');
+
+      if (!confirm('Are you sure you want to unlock this channel? It will become visible to @everyone again.')) return;
+
+      try {
+        await api('/api/panel/unlock', {
+          method: 'POST',
+          body: { channelId }
+        });
+        toast('Channel unlocked successfully!', 'success');
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    });
+  }
+
   // 3. Clear Chat
   clearBtn.addEventListener('click', async () => {
     if (!currentGuildId) return toast('Select a server first', 'error');
@@ -464,12 +545,6 @@
 
     if (!(opts.body instanceof FormData)) {
       config.headers['Content-Type'] = 'application/json';
-    }
-    
-    // Fallback for manual key if still using it for some reason
-    const key = localStorage.getItem('admin_key');
-    if (key) {
-      config.headers['Authorization'] = `Bearer ${key}`;
     }
 
     if (opts.body) {
