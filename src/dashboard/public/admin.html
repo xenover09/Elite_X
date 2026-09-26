@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elite X — Developer Console</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Developer Console specific styling */
+    :root {
+      --admin-accent: #facc15;
+      --admin-accent-glow: rgba(250, 204, 21, 0.2);
+    }
+    
+    .admin-header {
+      background: linear-gradient(90deg, #1f2937 0%, #111827 100%);
+      border-bottom: 2px solid var(--admin-accent);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .admin-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--admin-accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px var(--admin-accent-glow);
+    }
+    
+    .stat-card-admin {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--admin-accent);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .stat-card-admin:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px var(--admin-accent-glow);
+    }
+    
+    .stat-value-admin {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 10px;
+    }
+    
+    .guilds-table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 30px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    
+    th {
+      background: rgba(255,255,255,0.05);
+      padding: 15px 20px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    td {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+    
+    .guild-icon-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    .premium-badge {
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="is-logged-in">
+
+  <header class="admin-header">
+    <div class="admin-title">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Elite X Developer Console
+    </div>
+    <div>
+      <a href="/dashboard" class="btn btn-outline" style="border-color: var(--border); color: var(--text-primary);">Back to App</a>
+    </div>
+  </header>
+
+  <main style="padding: 40px; max-width: 1200px; margin: 0 auto;">
+    
+    <!-- System Stats -->
+    <h2 style="margin-bottom: 20px; color: var(--text-primary);">System Overview</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+      
+      <div class="stat-card-admin">
+        <div style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Total Servers</div>
+        <div class="stat-value-admin" id="total-servers">--</div>
+      </div>
+      
+      <div class="stat-card-admin">
+        <div style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Total Users Reached</div>
+        <div class="stat-value-admin" id="total-users">--</div>
+      </div>
+
+    </div>
+
+    <!-- Future Premium Tool -->
+    <div style="margin-top: 40px; background: rgba(250, 204, 21, 0.05); border: 1px dashed var(--admin-accent); padding: 25px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <h3 style="color: var(--admin-accent); margin-bottom: 5px;">Premium Management (Coming Soon)</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 600px;">Grant premium access to specific users or servers. This feature will unlock higher API limits and custom models.</p>
+      </div>
+      <div>
+        <button class="btn" style="background: var(--admin-accent); color: #000; font-weight: 700; cursor: not-allowed; opacity: 0.7;">Manage Premium</button>
+      </div>
+    </div>
+
+    <!-- Servers Table -->
+    <h2 style="margin-top: 40px; margin-bottom: 20px; color: var(--text-primary);">Connected Servers</h2>
+    <div class="guilds-table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Server Name</th>
+            <th>Server ID</th>
+            <th>Members</th>
+            <th>Owner ID</th>
+            <th>Joined At</th>
+          </tr>
+        </thead>
+        <tbody id="admin-table-body">
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <script>
+    async function loadAdminData() {
+      try {
+        const res = await fetch('/api/admin/stats');
+        
+        if (res.status === 401 || res.status === 403) {
+          alert('Access Denied. You are not the Developer (ADMIN_ID mismatch). Redirecting...');
+          window.location.href = '/dashboard';
+          return;
+        }
+        
+        const data = await res.json();
+        
+        document.getElementById('total-servers').textContent = data.totalGuilds;
+        document.getElementById('total-users').textContent = data.totalUsers.toLocaleString();
+        
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '';
+        
+        data.guilds.sort((a, b) => b.memberCount - a.memberCount).forEach(g => {
+          const tr = document.createElement('tr');
+          const date = new Date(g.joinedAt).toLocaleDateString();
+          const iconHtml = g.icon 
+            ? `<img src="${g.icon}" class="guild-icon-sm">`
+            : `<div class="guild-icon-sm" style="background: var(--bg-hover); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">${g.name.charAt(0)}</div>`;
+            
+          tr.innerHTML = `
+            <td>${iconHtml} ${g.name}</td>
+            <td style="font-family: monospace; color: var(--text-secondary);">${g.id}</td>
+            <td><strong>${g.memberCount}</strong></td>
+            <td style="font-family: monospace; color: var(--text-secondary);">${g.ownerId}</td>
+            <td>${date}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        
+      } catch (err) {
+        console.error(err);
+        document.getElementById('admin-table-body').innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Failed to load stats. Check console.</td></tr>';
+      }
+    }
+    
+    loadAdminData();
+  </script>
+</body>
+</html>

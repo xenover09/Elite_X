@@ -12,6 +12,7 @@ const logger = require('../utils/logger');
 const settingsRoutes = require('./routes/settings.routes');
 const panelRoutes = require('./routes/panel.routes');
 const authRoutes = require('./routes/auth.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 /**
  * Starts the modular Express dashboard server.
@@ -91,6 +92,12 @@ function startDashboard(client) {
   app.use('/auth', authRoutes);
   app.use('/api/settings', settingsRoutes);
   app.use('/api/panel', panelRoutes);
+  app.use('/api/admin', adminRoutes);
+
+  // Admin View
+  app.get('/admin', (req, res) => {
+    res.sendFile(path.join(publicPath, 'admin.html'));
+  });
 
   // Health check
   app.get('/api/health', (req, res) => {
