@@ -600,81 +600,214 @@
   
   // --- Security Audit Logic ---
   const runAuditBtn = $('#run-audit-btn');
-  const auditScore = $('#audit-score');
-  const auditScoreCircle = $('#audit-score-circle');
-  const auditRisk = $('#audit-risk');
-  const auditNuke = $('#audit-nuke');
-  const auditFindings = $('#audit-findings');
+  const auditScoreNum = $('#audit-score-number');
+  const auditMainCircle = $('#audit-main-circle');
+  const auditRisk = $('#audit-score-risk');
+  const auditNuke = $('#audit-score-nuke');
+  const auditCategoriesGrid = $('#audit-categories-grid');
   const auditStrengths = $('#audit-strengths');
 
+  function getSeverityColor(severity) {
+    if (severity === 'Critical') return '#ef4444';
+    if (severity === 'High') return '#f97316';
+    if (severity === 'Medium') return '#eab308';
+    if (severity === 'Low') return '#3b82f6';
+    return '#22c55e';
+  }
+
+  function getScoreColor(score) {
+    if (score < 40) return '#ef4444';
+    if (score < 60) return '#f97316';
+    if (score < 80) return '#eab308';
+    return '#22c55e';
+  }
+
   function renderAudit(data) {
-    auditScore.textContent = data.score;
+    const mainColor = getScoreColor(data.score);
     
-    // Colors based on risk
-    let color = '#22c55e'; // Strong
-    if (data.score < 40) color = '#ef4444'; // Critical
-    else if (data.score < 60) color = '#f97316'; // Weak
-    else if (data.score < 80) color = '#eab308'; // Moderate
-    
-    auditScoreCircle.style.background = `conic-gradient(${color} ${data.score}%, #333 0)`;
-    auditScore.style.color = color;
+    // Animate wheel
+    auditScoreNum.textContent = data.score;
+    auditScoreNum.style.color = mainColor;
+    auditMainCircle.style.stroke = mainColor;
+    // Stroke dasharray represents percentage (0 to 100)
+    auditMainCircle.style.strokeDasharray = `${data.score}, 100`;
     
     auditRisk.textContent = `${data.riskLevel} Security`;
-    auditNuke.textContent = data.nukeRisk;
-    auditNuke.style.color = color;
+    auditNuke.textContent = `Nuke Risk: ${data.nukeRisk}`;
+    auditNuke.style.color = mainColor;
 
-    // Findings
-    auditFindings.innerHTML = '';
-    if (data.findings.length === 0) {
-      auditFindings.innerHTML = '<div style="padding: 20px; text-align: center; color: #22c55e; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border: 1px solid rgba(34,197,94,0.3);">No security risks found! Excellent job.</div>';
-    } else {
-      data.findings.forEach(f => {
-        let fColor = '#3b82f6';
-        let bg = 'rgba(59, 130, 246, 0.1)';
-        if (f.severity === 'Critical') { fColor = '#ef4444'; bg = 'rgba(239, 68, 68, 0.1)'; }
-        else if (f.severity === 'High') { fColor = '#f97316'; bg = 'rgba(249, 115, 22, 0.1)'; }
-        else if (f.severity === 'Medium') { fColor = '#eab308'; bg = 'rgba(234, 179, 8, 0.1)'; }
-        
-        const card = document.createElement('div');
-        card.style.cssText = `background: var(--bg-body); border-left: 4px solid ${fColor}; border-radius: 4px; padding: 15px; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);`;
-        card.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-            <span style="background: ${bg}; color: ${fColor}; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">${f.severity}</span>
-            <strong style="color: var(--text-primary); font-size: 1rem;">${f.title}</strong>
-          </div>
-          <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px;">${f.detail}</div>
-          <div style="font-size: 0.85rem; color: var(--accent); font-weight: 600;">Fix: ${f.fix}</div>
-        `;
-        auditFindings.appendChild(card);
+    // Process categories
+    const allCategories = ['Settings', 'Roles', 'Bots', 'Webhooks', 'Information'];
+    const catData = {};
+    
+    allCategories.forEach(c => catData[c] = { score: 100, findings: [], worstLevel: 4 }); // 0=Critical, 4=Secure
+    
+    data.findings.forEach(f => {
+      if (!catData[f.category]) catData[f.category] = { score: 100, findings: [], worstLevel: 4 };
+      catData[f.category].findings.push(f);
+      
+      let level = 3;
+      let deduction = 2;
+      if (f.severity === 'Critical') { deduction = 20; level = 0; }
+      else if (f.severity === 'High') { deduction = 10; level = 1; }
+      else if (f.severity === 'Medium') { deduction = 5; level = 2; }
+      
+      if (level < catData[f.category].worstLevel) catData[f.category].worstLevel = level;
+      catData[f.category].score = Math.max(0, catData[f.category].score - deduction);
+    });
+
+    auditCategoriesGrid.innerHTML = '';
+    
+    // Render Category Cards
+    Object.keys(catData).forEach(catName => {
+      const cat = catData[catName];
+      const hasIssues = cat.findings.length > 0;
+      const catColor = hasIssues ? getScoreColor(cat.score) : '#22c55e';
+      
+      const card = document.createElement('div');
+      card.className = 'audit-cat-card';
+      card.style.cssText = `
+        background: var(--bg-body); 
+        border-radius: 12px; 
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: all 0.3s;
+      `;
+
+      // Card Header
+      const header = document.createElement('div');
+      header.style.cssText = `
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        position: relative;
+      `;
+      
+      // Mini Ring
+      const ringHtml = `
+        <div style="width: 48px; height: 48px; position: relative;">
+          <svg viewBox="0 0 36 36" style="width:100%; height:100%; transform: rotate(-90deg);">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3" />
+            <path stroke-dasharray="${cat.score}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${catColor}" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <div style="position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); font-size: 0.75rem; font-weight: 700; color: ${catColor};">${cat.score}</div>
+        </div>
+      `;
+
+      const badgeHtml = hasIssues 
+        ? `<span style="background: ${catColor}22; color: ${catColor}; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">${cat.findings.length} issues</span>`
+        : `<span style="background: rgba(34,197,94,0.1); color: #22c55e; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">Secure</span>`;
+
+      header.innerHTML = `
+        ${ringHtml}
+        <div style="flex: 1;">
+          <h4 style="margin:0; font-size: 1.1rem; color: var(--text-primary);">${catName}</h4>
+          <div style="margin-top: 4px;">${badgeHtml}</div>
+        </div>
+        <div style="color: var(--text-muted); transition: transform 0.3s;" class="chevron">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      `;
+      
+      card.appendChild(header);
+
+      // Findings Container (Expandable)
+      const findingsContainer = document.createElement('div');
+      findingsContainer.style.cssText = `
+        display: none;
+        padding: 0 20px 20px 20px;
+        border-top: 1px solid var(--border);
+        background: rgba(0,0,0,0.1);
+      `;
+      
+      if (hasIssues) {
+        cat.findings.forEach(f => {
+          const fColor = getSeverityColor(f.severity);
+          const fItem = document.createElement('div');
+          fItem.style.cssText = `margin-top: 15px; padding-left: 12px; border-left: 3px solid ${fColor};`;
+          fItem.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: ${fColor};">${f.severity}</span>
+              <strong style="color: var(--text-primary); font-size: 0.95rem;">${f.title}</strong>
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px; line-height: 1.4;">${f.detail}</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);"><strong style="color:var(--text-primary);">Fix:</strong> ${f.fix}</div>
+          `;
+          findingsContainer.appendChild(fItem);
+        });
+      } else {
+        findingsContainer.innerHTML = `<div style="padding-top:15px; color: #22c55e; font-size: 0.9rem;">No issues found in ${catName}.</div>`;
+      }
+      card.appendChild(findingsContainer);
+
+      // Expand toggle
+      header.addEventListener('click', () => {
+        const isExpanded = findingsContainer.style.display === 'block';
+        findingsContainer.style.display = isExpanded ? 'none' : 'block';
+        header.querySelector('.chevron').style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+        card.style.borderColor = isExpanded ? 'var(--border)' : catColor;
       });
-    }
+
+      auditCategoriesGrid.appendChild(card);
+    });
 
     // Strengths
     auditStrengths.innerHTML = '';
-    data.strengths.forEach(s => {
-      const li = document.createElement('li');
-      li.textContent = s;
-      auditStrengths.appendChild(li);
-    });
+    if (data.strengths.length === 0) {
+      auditStrengths.innerHTML = '<div style="color: var(--text-muted); font-size: 0.95rem; font-style: italic;">No strong points identified.</div>';
+    } else {
+      data.strengths.forEach(s => {
+        const row = document.createElement('div');
+        row.style.cssText = `display: flex; align-items: flex-start; gap: 10px; background: var(--bg-body); padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border);`;
+        row.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><path d="M20 6L9 17l-5-5"/></svg>
+          <span style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.4;">${s}</span>
+        `;
+        auditStrengths.appendChild(row);
+      });
+    }
   }
 
   async function loadSecurityAudit() {
-    if (!currentGuildId) return;
+    if (!currentGuildId) return toast('Select a server first', 'error');
     try {
-      runAuditBtn.textContent = 'Scanning...';
+      const origText = runAuditBtn.textContent;
+      runAuditBtn.innerHTML = '<svg class="spinner" viewBox="0 0 50 50" style="width:20px;height:20px;animation:spin 1s linear infinite;"><circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="80" stroke-linecap="round"></circle></svg> Scanning...';
+      runAuditBtn.disabled = true;
+      runAuditBtn.style.opacity = '0.7';
+      
+      // Reset wheel
+      auditMainCircle.style.strokeDasharray = '0, 100';
+      auditScoreNum.textContent = '--';
+      auditScoreNum.style.color = 'var(--text-primary)';
+      auditRisk.textContent = 'Scanning...';
+      auditNuke.textContent = 'Nuke Risk: --';
+      auditNuke.style.color = 'var(--text-muted)';
+      
       const data = await api(`/api/panel/security-audit`);
-      renderAudit(data);
+      
+      // small delay for animation effect
+      setTimeout(() => {
+        renderAudit(data);
+        runAuditBtn.textContent = 'Re-scan Server';
+        runAuditBtn.disabled = false;
+        runAuditBtn.style.opacity = '1';
+      }, 500);
+      
     } catch(err) {
       toast('Failed to run security audit', 'error');
-    } finally {
       runAuditBtn.textContent = 'Re-scan Server';
+      runAuditBtn.disabled = false;
+      runAuditBtn.style.opacity = '1';
     }
   }
 
   if (runAuditBtn) {
     runAuditBtn.addEventListener('click', loadSecurityAudit);
   }
-
+  
   // ─── Panel Actions ───────────────────────────────────
 
   // 1. Send Embed
