@@ -50,6 +50,17 @@ router.post('/automod', authMiddleware, guildAuthMiddleware, (req, res) => {
 });
 
 /**
+ * POST /api/settings/modlog
+ */
+router.post('/modlog', authMiddleware, guildAuthMiddleware, (req, res) => {
+  const guildId = req.targetGuildId;
+  if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
+  const { updateModLogSettings } = require('../../services/settingsService');
+  const result = updateModLogSettings(guildId, req.body);
+  res.json(result);
+});
+
+/**
  * GET /api/settings/guilds
  * Returns list of user's guilds (with Manage Server/Admin perms), marking if the bot is in them.
  */

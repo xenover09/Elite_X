@@ -358,6 +358,13 @@
     if (amCaps) amCaps.checked = data.amCaps || false;
     if (amBadwords) amBadwords.checked = data.amBadwords || false;
     if (amInvites) amInvites.checked = data.amInvites || false;
+    
+    // Mod Log
+    const modLogEnabled = $('#modlog-enabled');
+    const modLogChannel = $('#modlog-channel-select');
+    if (modLogEnabled) modLogEnabled.checked = data.modLogEnabled || false;
+    if (modLogChannel) modLogChannel.value = data.modLogChannelId || '';
+
 
   }
 
@@ -561,6 +568,30 @@
         loadRRList();
       } catch(err) {
         toast(err.message, 'error');
+      }
+    });
+  }
+
+  
+  const modLogForm = $('#modlog-form');
+  if (modLogForm) {
+    modLogForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentGuildId) return toast('Select a server first', 'error');
+      
+      const payload = {
+        modLogEnabled: $('#modlog-enabled').checked,
+        modLogChannelId: $('#modlog-channel-select').value
+      };
+      
+      try {
+        await api('/api/settings/modlog', {
+          method: 'POST',
+          body: payload
+        });
+        toast('Mod Log settings saved successfully!', 'success');
+      } catch (e) {
+        toast(e.message || 'Failed to save Mod Log settings', 'error');
       }
     });
   }

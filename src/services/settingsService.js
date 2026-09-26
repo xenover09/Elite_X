@@ -19,7 +19,9 @@ function getSettings(guildId) {
     amMentions: state.amMentions,
     amCaps: state.amCaps,
     amBadwords: state.amBadwords,
-    amInvites: state.amInvites
+    amInvites: state.amInvites,
+    modLogEnabled: state.modLogEnabled,
+    modLogChannelId: state.modLogChannelId
   };
 }
 
@@ -33,6 +35,6 @@ function toggleAI(guildId) {
   return { aiEnabled: newValue };
 }
 
-const { updateAutoModSettings } = require('../store/panelState');
+const { updateAutoModSettings, updateModLogSettings } = require('../store/panelState');
 
-module.exports = { getSettings, toggleAI, updateAISettings, updateAutoModSettings };
+module.exports = { getSettings, toggleAI, updateAISettings, updateAutoModSettings, updateModLogSettings };

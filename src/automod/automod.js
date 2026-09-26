@@ -18,6 +18,8 @@ async function takeAction(message, reason) {
     // 1. Log the action
     logger.warn(`[AutoMod] Triggered for ${message.author.tag} in guild "${message.guild.name}". Reason: ${reason}`);
 
+    const { sendModLog } = require('../services/modlog');
+
     // 2. Delete message if we have permission
     if (message.deletable) {
       await message.delete().catch(() => {});
@@ -26,8 +28,23 @@ async function takeAction(message, reason) {
     // 3. Timeout user for 60s if we have permission
     if (message.member && message.member.moderatable) {
       await message.member.timeout(60 * 1000, `AutoMod: ${reason}`).catch(() => {});
+      
+      await sendModLog(message.guild, {
+        action: 'Message Deleted & User Timeout (AutoMod)',
+        target: `${message.author.tag} (${message.author.id})`,
+        moderator: 'Elite X AutoMod',
+        reason: reason,
+        color: '#ef4444' // red
+      });
     } else {
       logger.info(`[AutoMod] Could not timeout ${message.author.tag} in ${message.guild.name} (Missing permissions or hierarchy).`);
+      await sendModLog(message.guild, {
+        action: 'Message Deleted (AutoMod)',
+        target: `${message.author.tag} (${message.author.id})`,
+        moderator: 'Elite X AutoMod',
+        reason: `${reason} (Could not apply timeout due to hierarchy/perms)`,
+        color: '#ef4444'
+      });
     }
   } catch (err) {
     logger.error(`[AutoMod] Error executing action on ${message.author.tag}`, err.message);

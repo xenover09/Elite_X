@@ -10,12 +10,14 @@ function getState(guildId) {
       aiChat: false, 
       aiChannel: '',
       aiApiKey: '',
-      aiPersonality: 'default', // For phase 3
+      aiPersonality: 'default',
       amSpam: false,
       amMentions: false,
       amCaps: false,
       amBadwords: false,
-      amInvites: false
+      amInvites: false,
+      modLogEnabled: false,
+      modLogChannelId: ''
     });
   }
   return state.get(guildId);
@@ -54,4 +56,12 @@ function updateAutoModSettings(guildId, settings) {
   return current;
 }
 
-module.exports = { getState, toggleFeature, updateAISettings, updateAutoModSettings };
+function updateModLogSettings(guildId, settings) {
+  const current = getState(guildId);
+  if (typeof settings.modLogEnabled === 'boolean') current.modLogEnabled = settings.modLogEnabled;
+  if (typeof settings.modLogChannelId === 'string') current.modLogChannelId = settings.modLogChannelId;
+  state.set(guildId, current);
+  return current;
+}
+
+module.exports = { getState, toggleFeature, updateAISettings, updateAutoModSettings, updateModLogSettings };

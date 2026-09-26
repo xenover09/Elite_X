@@ -135,6 +135,14 @@ async function lockChannel({ channelId, roleIds }) {
 
   await channel.permissionOverwrites.set(overwrites);
   logger.info(`Channel ${channelId} locked for roles: ${roleIds.join(', ')}`);
+  
+  const { sendModLog } = require('./modlog');
+  await sendModLog(channel.guild, {
+    action: 'Channel Locked',
+    target: `<#${channelId}>`,
+    moderator: 'Admin (via Dashboard)',
+    color: '#d4af37' // gold
+  });
 }
 
 /**
@@ -148,6 +156,8 @@ async function clearChat(channelId) {
   const channel = await discordClient.channels.fetch(channelId);
   if (!channel || !channel.isTextBased()) throw new Error('Invalid channel.');
 
+  const guild = channel.guild;
+
   const newChannel = await channel.clone({
     reason: 'Chat cleared via dashboard (clone method)',
     position: channel.position
@@ -155,6 +165,15 @@ async function clearChat(channelId) {
 
   await channel.delete('Chat cleared via dashboard');
   logger.info(`Channel ${channelId} cleared (cloned to ${newChannel.id})`);
+  
+  const { sendModLog } = require('./modlog');
+  await sendModLog(guild, {
+    action: 'Chat Cleared (Purge)',
+    target: `<#${newChannel.id}>`,
+    moderator: 'Admin (via Dashboard)',
+    color: '#d4af37'
+  });
+
   return newChannel.id;
 }
 
@@ -174,6 +193,14 @@ async function unlockChannel(channelId) {
     SendMessages: null
   });
   logger.info(`Channel ${channelId} unlocked`);
+  
+  const { sendModLog } = require('./modlog');
+  await sendModLog(channel.guild, {
+    action: 'Channel Unlocked',
+    target: `<#${channelId}>`,
+    moderator: 'Admin (via Dashboard)',
+    color: '#d4af37'
+  });
 }
 
 module.exports = { init, sendPanel, lockChannel, unlockChannel, clearChat };
