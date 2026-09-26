@@ -298,8 +298,18 @@ input, textarea, select { font-family: inherit; }
 
 /* Features */
 .landing-features {
+  /* Force Light Theme for bottom section */
+  --bg-base:    #ffffff;
+  --bg-surface: #ffffff;
+  --bg-card:    #f4f4f5;
+  --border:     #e4e4e7;
+  --text-primary:   #18181b;
+  --text-secondary: #3f3f46;
+  --text-muted:     #71717a;
+
   padding: 80px 40px;
   background: var(--bg-surface);
+  color: var(--text-primary);
   text-align: center;
 }
 .features-title {
@@ -351,6 +361,13 @@ input, textarea, select { font-family: inherit; }
 
 /* Footer */
 .landing-footer {
+  /* Force Light Theme for footer */
+  --bg-base:    #ffffff;
+  --border:     #e4e4e7;
+  --text-muted:     #71717a;
+  --text-primary:   #18181b;
+  --accent:         #3b82f6;
+
   padding: 40px;
   text-align: center;
   background: var(--bg-base);
