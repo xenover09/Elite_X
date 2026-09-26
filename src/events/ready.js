@@ -22,7 +22,7 @@ module.exports = {
       client.user.setPresence({
         activities: [
           {
-            name: '/ask | /dashboard',
+            name: '/ask | /poll | /serverinfo | /userinfo | /avatar',
             type: ActivityType.Watching,
           },
         ],
