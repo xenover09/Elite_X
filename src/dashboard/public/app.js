@@ -97,8 +97,10 @@
         // If they are on the root URL '/', show the landing page as requested.
         if (window.location.pathname === '/' || window.location.pathname === '') {
           showScreen('login'); // This shows the landing page
+          // Fetch data in background so it's instantly ready
+          loadDashboard(data.user, false);
         } else {
-          await loadDashboard(data.user);
+          await loadDashboard(data.user, true);
         }
       } else {
         // Not authenticated: always show landing page
@@ -121,9 +123,9 @@
     }
   }
 
-  async function loadDashboard(user) {
+  async function loadDashboard(user, showServers = true) {
     try {
-      showScreen('servers');
+      if (showServers) showScreen('servers');
       
       // Fetch bot info for later use
       healthData = await api('/api/health');
@@ -544,13 +546,27 @@
 
   if (navDashboardBtn) {
     navDashboardBtn.addEventListener('click', () => {
-      if (window.location.pathname !== '/dashboard') {
-        window.location.href = '/dashboard';
-      } else {
-        showScreen('servers');
-      }
+      history.pushState({}, '', '/dashboard');
+      showScreen(currentGuildId ? 'dashboard' : 'servers');
     });
   }
+  
+  const topbarLogoBtn = $('.topbar-left');
+  if (topbarLogoBtn) {
+    topbarLogoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.pushState({}, '', '/');
+      showScreen('login');
+    });
+  }
+
+  window.addEventListener('popstate', () => {
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+      showScreen('login');
+    } else if (window.location.pathname === '/dashboard') {
+      showScreen(currentGuildId ? 'dashboard' : 'servers');
+    }
+  });
   if (refreshGuildsBtn) {
     refreshGuildsBtn.addEventListener('click', fetchAndRenderGuilds);
   }
