@@ -913,7 +913,11 @@ input, textarea, select { font-family: inherit; }
   max-width: 1100px;
   margin: 0 auto;
   padding: 25px;
-  padding-bottom: 300px; /* Extra space to force native select dropdowns downwards */
+}
+
+/* Extra space for tabs with dropdowns to force native selects downwards */
+.tab-content:not(#card-overview) {
+  padding-bottom: 300px;
 }
 
 /* ── Server Overview (Welcomer Style) ─────────────────── */
