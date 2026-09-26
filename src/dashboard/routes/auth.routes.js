@@ -14,6 +14,15 @@ router.get('/discord', (req, res, next) => {
 }, passport.authenticate('discord'));
 
 /**
+ * GET /invite
+ * Redirects to the bot's Discord invite URL using the actual Client ID.
+ */
+router.get('/invite', (req, res) => {
+  const clientId = process.env.CLIENT_ID || process.env.DISCORD_CLIENT_ID;
+  res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`);
+});
+
+/**
  * GET /auth/callback
  * Discord redirect back to the app after authorization.
  */
