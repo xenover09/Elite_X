@@ -38,8 +38,11 @@ router.get('/callback', (req, res, next) => {
         console.error('[AUTH] Session login error details:', loginErr);
         return res.redirect('/?error=session_error');
       }
-      console.log(`[AUTH] Successfully logged in and session saved: ${user.username} (${user.id})`);
-      return res.redirect('/dashboard');
+      console.log(`[AUTH] Successfully logged in: ${user.username} (${user.id}). Saving session...`);
+      req.session.save((saveErr) => {
+        if (saveErr) console.error('[AUTH] Session save error:', saveErr);
+        return res.redirect('/dashboard');
+      });
     });
   })(req, res, next);
 });

@@ -52,7 +52,11 @@ function startDashboard(client) {
     secret: process.env.SESSION_SECRET || 'elite_bot_secret_xyz_123',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS strictly
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies if in production
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   }));
 
   app.use(passport.initialize());
