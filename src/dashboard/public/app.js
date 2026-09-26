@@ -83,8 +83,22 @@
       const data = await res.json();
       
       if (data.authenticated) {
-        await loadDashboard(data.user);
+        // If authenticated, change the "Log in" button on the landing page to "Dashboard"
+        const loginLink = document.querySelector('.landing-nav-links a[href="/auth/discord"]');
+        if (loginLink) {
+          loginLink.textContent = 'Dashboard';
+          loginLink.href = '/dashboard';
+        }
+
+        // Only show dashboard if they are actually on /dashboard or another sub-route.
+        // If they are on the root URL '/', show the landing page as requested.
+        if (window.location.pathname === '/' || window.location.pathname === '') {
+          showScreen('login'); // This shows the landing page
+        } else {
+          await loadDashboard(data.user);
+        }
       } else {
+        // Not authenticated: always show landing page, but ensure it points to login
         showScreen('login');
       }
     } catch (e) {
