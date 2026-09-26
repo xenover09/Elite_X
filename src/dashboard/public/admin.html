@@ -453,15 +453,15 @@
           const escapedName = escapeHtml(g.name);
           
           const iconHtml = g.icon 
-            ? \`<img src="\${g.icon}" class="guild-icon" alt="">\`
-            : \`<div class="guild-icon">\${escapedName.charAt(0)}</div>\`;
+            ? `<img src="${g.icon}" class="guild-icon" alt="">`
+            : `<div class="guild-icon">${escapedName.charAt(0)}</div>`;
             
-          tr.innerHTML = \`
-            <td><div class="server-name-cell">\${iconHtml} \${escapedName}</div></td>
-            <td class="mono copy-id" title="Click to copy">\${g.id}</td>
-            <td class="tabular">\${g.memberCount.toLocaleString()}</td>
-            <td class="mono copy-id" title="Click to copy">\${g.ownerId}</td>
-            <td class="tabular" style="color: var(--text-muted);">\${date}</td>\`;
+          tr.innerHTML = `
+            <td><div class="server-name-cell">${iconHtml} ${escapedName}</div></td>
+            <td class="mono copy-id" title="Click to copy">${g.id}</td>
+            <td class="tabular">${g.memberCount.toLocaleString()}</td>
+            <td class="mono copy-id" title="Click to copy">${g.ownerId}</td>
+            <td class="tabular" style="color: var(--text-muted);">${date}</td>`;
           tbody.appendChild(tr);
         });
         
@@ -471,7 +471,7 @@
         console.error(err);
         const errContainer = document.getElementById('error-container');
         errContainer.style.display = 'block';
-        errContainer.innerHTML = \`<div class="error-msg">Failed to load system statistics. Please try refreshing.</div>\`;
+        errContainer.innerHTML = `<div class="error-msg">Failed to load system statistics. Please try refreshing.</div>`;
         
         document.getElementById('total-servers').classList.remove('skeleton', 'skeleton-value');
         document.getElementById('total-users').classList.remove('skeleton', 'skeleton-value');
