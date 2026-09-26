@@ -25,9 +25,15 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
   try {
     logger.info(`Deploying ${commands.length} application (/) commands...`);
 
-    const route = process.env.DISCORD_GUILD_ID
-      ? Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID)
-      : Routes.applicationCommands(process.env.DISCORD_CLIENT_ID);
+    const clientId = process.env.CLIENT_ID || process.env.DISCORD_CLIENT_ID;
+    const guildId = process.env.DISCORD_GUILD_ID;
+    
+    // Check if guildId is a valid snowflake (only numbers)
+    const isValidGuildId = guildId && /^\d+$/.test(guildId);
+
+    const route = isValidGuildId
+      ? Routes.applicationGuildCommands(clientId, guildId)
+      : Routes.applicationCommands(clientId);
 
     const data = await rest.put(route, { body: commands });
 
