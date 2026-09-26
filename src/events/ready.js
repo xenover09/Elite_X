@@ -14,15 +14,21 @@ module.exports = {
     logger.info(`Bot is online as ${client.user.tag}`);
     logger.info(`Serving ${client.guilds.cache.size} guild(s)`);
 
-    client.user.setPresence({
-      activities: [
-        {
-          name: 'dashboard | /ask',
-          type: ActivityType.Watching,
-        },
-      ],
-      status: 'online',
-    });
+    const updatePresence = () => {
+      client.user.setPresence({
+        activities: [
+          {
+            name: `${client.guilds.cache.size} servers | /dashboard`,
+            type: ActivityType.Watching,
+          },
+        ],
+        status: 'online',
+      });
+    };
+
+    updatePresence();
+    // Update presence every 10 minutes in case bot joins/leaves servers
+    setInterval(updatePresence, 10 * 60 * 1000);
 
     // --- Queue Processor ---
     // Check for pending dashboard panels every 5 seconds
