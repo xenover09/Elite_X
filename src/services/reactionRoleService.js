@@ -32,10 +32,23 @@ async function createReactionRoleMessage(guildId, data) {
   const botHighestRole = botMember.roles.highest.position;
 
   for (const pair of pairs) {
+    let raw = pair.emoji;
+    let customEmojiMatch = raw.match(/<a?:\w+:\d+>/);
+    if (customEmojiMatch) {
+      pair.emoji = customEmojiMatch[0];
+    } else {
+      let unicodeMatch = raw.match(/\p{Emoji_Presentation}/u) || raw.match(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/);
+      if (unicodeMatch) {
+        pair.emoji = unicodeMatch[0];
+      } else {
+        throw new Error(`Invalid emoji provided: "${raw}". Please provide a valid Emoji.`);
+      }
+    }
+    
     const role = guild.roles.cache.get(pair.roleId);
     if (!role) throw new Error(`Role ${pair.roleId} does not exist.`);
     if (role.position >= botHighestRole) {
-      throw new Error(`Bot cannot assign the role "${role.name}" because it is equal to or higher than the bot's highest role.`);
+      throw new Error(`Bot cannot assign the role "${role.name}" because it is equal to or higher than the bot's highest role. Please move the Bot's role higher in Discord Server Settings.`);
     }
   }
 

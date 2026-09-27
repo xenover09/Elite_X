@@ -570,6 +570,7 @@
         loadRRList();
       } catch(err) {
         toast(err.message, 'error');
+        alert('Failed to create Reaction Role Message:\n' + err.message);
       }
     });
   }
