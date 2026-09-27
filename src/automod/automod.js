@@ -51,6 +51,40 @@ async function takeAction(message, reason) {
   }
 }
 
+// --- Pure Detection Functions ---
+
+function hasInvites(content) {
+  const inviteRegex = /(discord\.gg|discordapp\.com\/invite|discord\.com\/invite)\/[a-zA-Z0-9]+/i;
+  return inviteRegex.test(content);
+}
+
+function hasBadWords(content) {
+  const contentLower = content.toLowerCase();
+  for (const word of badwords) {
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    if (regex.test(contentLower)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasExcessiveCaps(content) {
+  if (content.length <= 10) return false;
+  const letters = content.replace(/[^a-zA-Z]/g, '');
+  if (letters.length <= 10) return false;
+  const caps = letters.replace(/[^A-Z]/g, '').length;
+  return (caps / letters.length) > 0.7;
+}
+
+function hasExcessiveMentions(content) {
+  const mentionMatches = content.match(/<@!?\d+>/g);
+  const mentionCount = mentionMatches ? mentionMatches.length : 0;
+  return mentionCount >= 5;
+}
+
+// --------------------------------
+
 /**
  * Run AutoMod checks on a message.
  * @param {import('discord.js').Message} message 
@@ -67,51 +101,27 @@ async function check(message) {
   const content = message.content;
 
   // 1. Check Invites (discord.gg or discordapp.com/invite)
-  if (state.amInvites) {
-    const inviteRegex = /(discord\.gg|discordapp\.com\/invite|discord\.com\/invite)\/[a-zA-Z0-9]+/i;
-    if (inviteRegex.test(content)) {
-      await takeAction(message, 'Posted a Discord invite link.');
-      return true; // Stop processing other rules
-    }
+  if (state.amInvites && hasInvites(content)) {
+    await takeAction(message, 'Posted a Discord invite link.');
+    return true; // Stop processing other rules
   }
 
   // 2. Check Bad Words
-  if (state.amBadwords && content) {
-    const contentLower = content.toLowerCase();
-    for (const word of badwords) {
-      // Very basic substring match (could be improved to word boundary)
-      // We will use word boundary for better accuracy:
-      const regex = new RegExp(`\\b${word}\\b`, 'i');
-      if (regex.test(contentLower)) {
-        await takeAction(message, 'Used inappropriate language.');
-        return true;
-      }
-    }
+  if (state.amBadwords && content && hasBadWords(content)) {
+    await takeAction(message, 'Used inappropriate language.');
+    return true;
   }
 
   // 3. Check Excessive Caps (10+ chars, 70%+ caps)
-  if (state.amCaps && content.length > 10) {
-    const letters = content.replace(/[^a-zA-Z]/g, '');
-    if (letters.length > 10) {
-      const caps = letters.replace(/[^A-Z]/g, '').length;
-      if (caps / letters.length > 0.7) {
-        await takeAction(message, 'Excessive use of capital letters.');
-        return true;
-      }
-    }
+  if (state.amCaps && hasExcessiveCaps(content)) {
+    await takeAction(message, 'Excessive use of capital letters.');
+    return true;
   }
 
   // 4. Check Excessive Mentions (5+ mentions)
-  if (state.amMentions) {
-    // message.mentions.users only counts unique users, which is usually fine,
-    // but a user could mention the same person 10 times.
-    const mentionMatches = content.match(/<@!?\d+>/g);
-    const mentionCount = mentionMatches ? mentionMatches.length : 0;
-    
-    if (mentionCount >= 5) {
-      await takeAction(message, 'Excessive mentions (spam).');
-      return true;
-    }
+  if (state.amMentions && hasExcessiveMentions(content)) {
+    await takeAction(message, 'Excessive mentions (spam).');
+    return true;
   }
 
   // 5. Check Spam (5 messages in 5 seconds)
@@ -136,4 +146,10 @@ async function check(message) {
   return false;
 }
 
-module.exports = { check };
+module.exports = { 
+  check,
+  hasInvites,
+  hasBadWords,
+  hasExcessiveCaps,
+  hasExcessiveMentions 
+};
