@@ -34,13 +34,14 @@ async function loadAllData() {
     }
 
     // Scan for all guild:* keys
-    let cursor = 0;
+    let cursor = "0";
+    let iterations = 0;
     const { setState } = require('./panelState');
     const { setGuildReactionRoles } = require('./reactionRoles');
 
     do {
       const result = await r.scan(cursor, { match: 'guild:*', count: 100 });
-      cursor = result[0];
+      cursor = String(result[0]);
       const keys = result[1];
       
       if (keys.length > 0) {
@@ -66,7 +67,11 @@ async function loadAllData() {
           }
         });
       }
-    } while (cursor !== 0);
+      if (++iterations > 50) { 
+        logger.warn('[Redis] SCAN iteration guard hit, breaking loop'); 
+        break; 
+      }
+    } while (cursor !== "0");
 
     logger.info('[Redis] Successfully preloaded all guild states.');
   } catch (err) {
