@@ -418,6 +418,7 @@
       if (!currentGuildId) return toast('Select a server first', 'error');
       
       const payload = {
+        guildId: currentGuildId,
         amSpam: $('#am-spam').checked,
         amMentions: $('#am-mentions').checked,
         amCaps: $('#am-caps').checked,
@@ -562,7 +563,7 @@
       try {
         await api('/api/panel/reactionrole', {
           method: 'POST',
-          body: { channelId, content, pairs }
+          body: { guildId: currentGuildId, channelId, content, pairs }
         });
         toast('Reaction role created!', 'success');
         $('#rr-content').value = '';
@@ -581,6 +582,7 @@
       if (!currentGuildId) return toast('Select a server first', 'error');
       
       const payload = {
+        guildId: currentGuildId,
         modLogEnabled: $('#modlog-enabled').checked,
         modLogChannelId: $('#modlog-channel-select').value
       };
