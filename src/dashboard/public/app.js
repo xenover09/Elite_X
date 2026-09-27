@@ -454,7 +454,7 @@
       const roles = await api(`/api/settings/${currentGuildId}/roles`);
       currentGuildRoles = roles.filter(r => r.id !== currentGuildId); // exclude @everyone
       // Update all existing dropdowns
-      $('.rr-role-select').forEach(sel => populateRoleSelect(sel, sel.value));
+      $$('.rr-role-select').forEach(sel => populateRoleSelect(sel, sel.value));
     } catch(err) {
       console.error(err);
     }
@@ -524,7 +524,7 @@
         rrListBody.appendChild(tr);
       });
       
-      $('.rr-del-btn').forEach(btn => {
+      $$('.rr-del-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const msgId = e.target.getAttribute('data-msg');
           if (!confirm('Delete this reaction role message mapping? (Will also attempt to delete the message in Discord)')) return;
@@ -562,7 +562,7 @@
       }
       
       const pairs = [];
-      $('.rr-pair-row').forEach(row => {
+      $$('.rr-pair-row').forEach(row => {
         const emoji = row.querySelector('.rr-emoji').value.trim();
         const roleId = row.querySelector('.rr-role-select').value;
         if (emoji && roleId) pairs.push({ emoji, roleId });
