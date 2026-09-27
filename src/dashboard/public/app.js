@@ -503,7 +503,7 @@
   async function loadRRList() {
     if (!currentGuildId) return;
     try {
-      const list = await api(`/api/panel/reactionroles`);
+      const list = await api(`/api/panel/reactionroles?guildId=${currentGuildId}`);
       rrListBody.innerHTML = '';
       if (list.length === 0) {
         rrListBody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">No active reaction roles.</td></tr>';
@@ -531,7 +531,7 @@
           try {
             await api('/api/panel/reactionrole', {
               method: 'DELETE',
-              body: { messageId: msgId }
+              body: { guildId: currentGuildId, messageId: msgId }
             });
             toast('Deleted successfully', 'success');
             loadRRList();
