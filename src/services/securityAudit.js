@@ -71,8 +71,8 @@ async function runSecurityAudit(guild) {
     findings.push({ severity: 'Medium', category: 'Bots', title: 'High number of Admin bots', detail: `Found ${adminBots.size} bots with Administrator permission.`, fix: 'Remove Administrator from bots that do not strictly need it.' });
   }
 
-  // 5. Member-level check (if members are cached)
-  if (guild.members.cache.size < guild.memberCount && !guild.client.options.intents.has(PermissionsBitField.Flags.GuildMembers)) {
+  const { GatewayIntentBits } = require('discord.js');
+  if (guild.members.cache.size < guild.memberCount && !guild.client.options.intents.has(GatewayIntentBits.GuildMembers)) {
     findings.push({ severity: 'Low', category: 'Information', title: 'Limited Member Scan', detail: 'The bot does not have the Server Members Intent enabled.', fix: 'Enable Server Members Intent in Discord Developer Portal for deeper member analysis.' });
   }
 
