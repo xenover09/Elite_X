@@ -23,6 +23,15 @@
     </a>
     <div class="topbar-right">
       <button id="nav-dashboard-btn" class="btn btn-primary mr-15" style="padding: 10px 24px; font-size: 1rem; font-weight: 700; border-radius: 8px;">Dashboard</button>
+      <div style="position: relative; margin-right: 15px;">
+        <div id="help-menu-toggle" style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-primary); font-weight: 600; padding: 10px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+          Help
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="help-dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; width: 280px; box-shadow: var(--shadow-md); margin-top: 10px; z-index: 9999; flex-direction: column; gap: 5px;">
+          <!-- Items will be populated by JS to keep HTML clean -->
+        </div>
+      </div>
       <div style="position: relative;">
         <div id="user-info" class="user-info" style="cursor: pointer;">
           <img id="user-avatar" class="user-avatar" src="" alt="Avatar" />
@@ -723,6 +732,21 @@
           </section>
 
         </main>
+      </div>
+    </div>
+
+    <!-- Global Help Modal -->
+    <div id="help-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: center; padding: 20px;">
+      <div style="background: var(--bg-card); width: 100%; max-width: 500px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-lg); overflow: hidden; display: flex; flex-direction: column;">
+        <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+          <h2 id="help-modal-title" style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">Help</h2>
+          <button id="help-modal-close" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 5px; transition: color 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div id="help-modal-content" style="padding: 20px; max-height: 70vh; overflow-y: auto; color: var(--text-primary); font-size: 0.95rem; line-height: 1.6;">
+          <!-- Content injected via JS -->
+        </div>
       </div>
     </div>
 

@@ -1111,4 +1111,178 @@
     toastContainer.appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
+
+  // --- Help Dropdown Logic ---
+  const helpMenuToggle = $('#help-menu-toggle');
+  const helpDropdownMenu = $('#help-dropdown-menu');
+  const helpModal = $('#help-modal');
+  const helpModalTitle = $('#help-modal-title');
+  const helpModalContent = $('#help-modal-content');
+  const helpModalClose = $('#help-modal-close');
+
+  const helpTopics = [
+    { id: 'bot-status', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', title: 'Bot Status', desc: 'Live system metrics & uptime' },
+    { id: 'ai-chat', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', title: 'AI Chat', desc: 'How to use /ask & personality' },
+    { id: 'automod', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', title: 'Smart AutoMod', desc: 'Spam, caps & invite protection' },
+    { id: 'reaction-roles', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>', title: 'Reaction Roles', desc: 'Self-assign roles setup' },
+    { id: 'mod-log', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>', title: 'Mod Log', desc: 'Track server actions' },
+    { id: 'security-audit', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>', title: 'Security Audit', desc: 'Analyze server risks' },
+    { id: 'embed-builder', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>', title: 'Embed Builder', desc: 'Create rich messages' }
+  ];
+
+  if (helpMenuToggle && helpDropdownMenu) {
+    helpDropdownMenu.innerHTML = helpTopics.map(topic => `
+      <a href="#" data-topic="${topic.id}" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 6px; text-decoration: none; color: var(--text-primary);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+        <div style="color: var(--primary); display: flex;">${topic.icon}</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.9rem;">${topic.title}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${topic.desc}</div>
+        </div>
+      </a>
+    `).join('');
+
+    helpMenuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = helpDropdownMenu.style.display === 'flex';
+      helpDropdownMenu.style.display = isVisible ? 'none' : 'flex';
+      const userMenu = $('#user-dropdown-menu');
+      if (userMenu) userMenu.style.display = 'none';
+    });
+
+    helpDropdownMenu.querySelectorAll('a').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        helpDropdownMenu.style.display = 'none';
+        const topicId = btn.getAttribute('data-topic');
+        const topic = helpTopics.find(t => t.id === topicId);
+        
+        helpModalTitle.innerHTML = `${topic.icon} ${topic.title}`;
+        helpModalContent.innerHTML = '<div style="text-align:center; padding: 20px;">Loading...</div>';
+        helpModal.style.display = 'flex';
+
+        if (topicId === 'bot-status') {
+          try {
+            const res = await fetch('/api/health');
+            const data = await res.json();
+            const formatUptime = (secs) => {
+              const d = Math.floor(secs / 86400);
+              const h = Math.floor((secs % 86400) / 3600);
+              const m = Math.floor((secs % 3600) / 60);
+              return `${d}d ${h}h ${m}m`;
+            };
+            helpModalContent.innerHTML = `
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                  <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">Bot Status</div>
+                  <div style="font-weight: bold; color: ${data.status === 'online' ? 'var(--success)' : 'var(--danger)'};">${data.status.toUpperCase()}</div>
+                </div>
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                  <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">Uptime</div>
+                  <div style="font-weight: bold;">${formatUptime(data.uptime)}</div>
+                </div>
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                  <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">Discord WebSocket</div>
+                  <div style="font-weight: bold;">${data.discord?.pingMs}ms ping</div>
+                </div>
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                  <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">Active Guilds</div>
+                  <div style="font-weight: bold;">${data.discord?.guilds}</div>
+                </div>
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                  <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">Redis Database</div>
+                  <div style="font-weight: bold; color: ${data.redis?.reachable ? 'var(--success)' : 'var(--danger)'};">${data.redis?.reachable ? 'CONNECTED' : 'UNREACHABLE'}</div>
+                </div>
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                  <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;">Version</div>
+                  <div style="font-weight: bold;">v${data.version}</div>
+                </div>
+              </div>
+            `;
+          } catch (err) {
+            helpModalContent.innerHTML = `<div style="color: var(--danger);">Failed to load status: ${escapeHtml(err.message)}</div>`;
+          }
+        } else {
+          // Static content for other topics
+          const guides = {
+            'ai-chat': `
+              <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <li><strong>How to use:</strong> Members can type <code>/ask &lt;question&gt;</code> in any channel, or just talk in the designated <em>AI Channel</em>.</li>
+                <li><strong>AI Personality:</strong> Go to the AI Settings tab to change the bot's tone (Default, Formal, Friendly, Strict). This instantly changes how the Groq AI responds.</li>
+                <li><strong>Requirements:</strong> Ensure you have provided a valid Groq API key in the AI Settings.</li>
+              </ul>
+            `,
+            'automod': `
+              <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <li><strong>Invites:</strong> Blocks <code>discord.gg</code> links instantly.</li>
+                <li><strong>Bad Words:</strong> Checks messages against a predefined list of English & Roman Urdu profanity.</li>
+                <li><strong>Spam:</strong> Prevents a user from sending 5+ messages within 5 seconds.</li>
+                <li><strong>Caps:</strong> Blocks messages where more than 70% of the characters are capitalized (minimum 10 chars).</li>
+                <li><strong>Mentions:</strong> Blocks messages containing 5 or more user mentions.</li>
+                <li><em>Note:</em> Members with "Manage Messages" or "Administrator" permissions are exempt. Toggle filters in the Manage Server tab.</li>
+              </ul>
+            `,
+            'reaction-roles': `
+              <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <li><strong>Step 1:</strong> Go to the Reaction Roles tab.</li>
+                <li><strong>Step 2:</strong> Select a target channel, type a message, and pick an Embed Color.</li>
+                <li><strong>Step 3:</strong> Add Emoji/Role pairs. (Ensure the emojis are default discord emojis).</li>
+                <li><strong>Step 4:</strong> Click Create. The bot will post the message and add the reactions automatically.</li>
+                <li><em>Crucial:</em> Elite X's role MUST be placed higher in the server settings than the roles it is trying to assign.</li>
+              </ul>
+            `,
+            'mod-log': `
+              <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <li><strong>What it does:</strong> Keeps a record of automated actions, such as AutoMod message deletions.</li>
+                <li><strong>How to set up:</strong> Go to Manage Server tab, toggle "Enable Mod Log", and select a private staff channel.</li>
+                <li>Once enabled, Elite X will send a rich embed to the selected channel every time a rule is violated.</li>
+              </ul>
+            `,
+            'security-audit': `
+              <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <li><strong>Usage:</strong> Click "Run Security Scan" in the Security Audit tab.</li>
+                <li><strong>Scoring:</strong> Starts at 100. Deductions occur for missing 2FA, dangerous @everyone permissions, or excessive webhooks.</li>
+                <li><strong>Risk Levels:</strong> 
+                  <ul>
+                    <li><span style="color:var(--success)">Low (80+)</span>: Well configured.</li>
+                    <li><span style="color:var(--warning)">Medium (60-79)</span>: Minor issues.</li>
+                    <li><span style="color:#f97316">High (40-59)</span>: Action required.</li>
+                    <li><span style="color:var(--danger)">Severe (<40)</span>: Highly vulnerable.</li>
+                  </ul>
+                </li>
+              </ul>
+            `,
+            'embed-builder': `
+              <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <li><strong>Usage:</strong> Use the Send Advanced Embed tool in the Manage Server tab.</li>
+                <li><strong>Customization:</strong> Set title, description, color, thumbnail URL, and image URL.</li>
+                <li><strong>Buttons:</strong> Add up to 5 interactive URL buttons (e.g., Links to websites or rules).</li>
+                <li>Perfect for creating professional looking announcement messages or server rules.</li>
+              </ul>
+            `
+          };
+          helpModalContent.innerHTML = guides[topicId] || '<p>Guide not found.</p>';
+        }
+      });
+    });
+
+    helpModalClose.addEventListener('click', () => {
+      helpModal.style.display = 'none';
+    });
+
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) helpModal.style.display = 'none';
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const userInfo = $('#user-info');
+    const userDropdownMenu = $('#user-dropdown-menu');
+    if (userDropdownMenu && userInfo && !userInfo.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+      userDropdownMenu.style.display = 'none';
+    }
+    if (helpDropdownMenu && !helpMenuToggle.contains(e.target) && !helpDropdownMenu.contains(e.target)) {
+      helpDropdownMenu.style.display = 'none';
+    }
+  });
+
 })();
