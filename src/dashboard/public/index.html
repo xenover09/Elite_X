@@ -410,22 +410,22 @@
             <form id="reaction-role-form" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
               <div class="form-group">
                 <label>Target Channel</label>
-                <select id="rr-channel-select" class="channel-select" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+                <select id="rr-channel-select" class="channel-select" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
                   <option value="" disabled selected>------- SELECT CHANNEL -------</option>
                 </select>
               </div>
               
               <div class="form-group">
                 <label>Message Content</label>
-                <textarea id="rr-content" placeholder="React to this message to get your roles!" rows="3" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary); font-family: var(--font-primary); resize: vertical;"></textarea>
+                <textarea id="rr-content" placeholder="React to this message to get your roles!" rows="3" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary); font-family: var(--font-primary); resize: vertical;"></textarea>
               </div>
               
               <div>
                 <label style="display: block; margin-bottom: 10px;">Emoji & Role Mappings (Max 10)</label>
                 <div id="rr-pairs-container" style="display: flex; flex-direction: column; gap: 10px;">
                   <div class="rr-pair-row" style="display: flex; gap: 10px;">
-                    <input type="text" class="rr-emoji" placeholder="Emoji (e.g. 🔥)" required style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
-                    <select class="rr-role-select" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+                    <input type="text" class="rr-emoji" placeholder="Emoji (e.g. 🔥)" style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+                    <select class="rr-role-select" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
                       <option value="" disabled selected>Select a role...</option>
                     </select>
                     <button type="button" class="btn btn-outline rr-remove-btn" style="padding: 10px; color: #ef4444; border-color: rgba(239,68,68,0.3);">×</button>

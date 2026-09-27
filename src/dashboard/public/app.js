@@ -478,8 +478,8 @@
       row.className = 'rr-pair-row';
       row.style.cssText = 'display: flex; gap: 10px;';
       row.innerHTML = `
-        <input type="text" class="rr-emoji" placeholder="Emoji (e.g. 🔥)" required style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
-        <select class="rr-role-select" required style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+        <input type="text" class="rr-emoji" placeholder="Emoji (e.g. 🔥)" style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
+        <select class="rr-role-select" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-primary);">
           <option value="" disabled selected>Select a role...</option>
         </select>
         <button type="button" class="btn btn-outline rr-remove-btn" style="padding: 10px; color: #ef4444; border-color: rgba(239,68,68,0.3);">×</button>
@@ -550,6 +550,16 @@
       e.preventDefault();
       const channelId = $('#rr-channel-select').value;
       const content = $('#rr-content').value.trim();
+      
+      if (!channelId) {
+        alert('Please scroll up and select a "Target Channel" first!');
+        return;
+      }
+      
+      if (!content) {
+        alert('Please scroll up and enter "Message Content"!');
+        return;
+      }
       
       const pairs = [];
       $('.rr-pair-row').forEach(row => {
