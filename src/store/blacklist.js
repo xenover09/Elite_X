@@ -42,6 +42,8 @@ function saveBlacklist() {
   } catch (e) {
     logger.error(`[Blacklist] Failed to save blacklist.json`, e);
   }
+  const { saveBlacklistData } = require('./persistentStore');
+  saveBlacklistData(blacklist);
 }
 
 function isUserBlacklisted(id) {
@@ -78,6 +80,12 @@ function getBlacklist() {
   return blacklist;
 }
 
+function setBlacklistState(data) {
+  blacklist = data;
+  if (!blacklist.user) blacklist.user = {};
+  if (!blacklist.guild) blacklist.guild = {};
+}
+
 // Initial load
 loadBlacklist();
 
@@ -86,5 +94,6 @@ module.exports = {
   isGuildBlacklisted,
   addToBlacklist,
   removeFromBlacklist,
-  getBlacklist
+  getBlacklist,
+  setBlacklistState
 };

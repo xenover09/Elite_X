@@ -45,16 +45,20 @@ loadEvents(client);
 initPanelService(client);
 initReactionRoleService(client);
 
-// Start the dashboard (Dashboard server IS the HTTP server)
-startDashboard(client);
+// Start the bot and dashboard asynchronously
+async function start() {
+  await require('./store/persistentStore').loadAllData();
+  
+  startDashboard(client);
+  
+  client.login(process.env.DISCORD_TOKEN).catch((err) => {
+    logger.error('❌ Failed to login to Discord. Check your DISCORD_TOKEN on Railway!');
+    logger.error(`Error details: ${err.message}`);
+    logger.warn('⚠️ Bot is offline, but the dashboard server will remain active.');
+  });
+}
 
-// Login
-client.login(process.env.DISCORD_TOKEN).catch((err) => {
-  logger.error('❌ Failed to login to Discord. Check your DISCORD_TOKEN on Railway!');
-  logger.error(`Error details: ${err.message}`);
-  logger.warn('⚠️ Bot is offline, but the dashboard server will remain active.');
-  // Removed process.exit(1) to prevent Railway 404 proxy errors during crash loops
-});
+start();
 
 // Global error handlers
 process.on('unhandledRejection', (reason, promise) => {

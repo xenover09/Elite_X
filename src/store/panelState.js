@@ -27,6 +27,7 @@ function toggleFeature(guildId, feature) {
   const current = getState(guildId);
   current[feature] = !current[feature];
   state.set(guildId, current);
+  require('./persistentStore').saveGuildState(guildId);
   return current[feature];
 }
 
@@ -42,6 +43,7 @@ function updateAISettings(guildId, settings) {
     current.aiPersonality = settings.aiPersonality;
   }
   state.set(guildId, current);
+  require('./persistentStore').saveGuildState(guildId);
   return current;
 }
 
@@ -53,6 +55,7 @@ function updateAutoModSettings(guildId, settings) {
   if (typeof settings.amBadwords === 'boolean') current.amBadwords = settings.amBadwords;
   if (typeof settings.amInvites === 'boolean') current.amInvites = settings.amInvites;
   state.set(guildId, current);
+  require('./persistentStore').saveGuildState(guildId);
   return current;
 }
 
@@ -61,7 +64,12 @@ function updateModLogSettings(guildId, settings) {
   if (typeof settings.modLogEnabled === 'boolean') current.modLogEnabled = settings.modLogEnabled;
   if (typeof settings.modLogChannelId === 'string') current.modLogChannelId = settings.modLogChannelId;
   state.set(guildId, current);
+  require('./persistentStore').saveGuildState(guildId);
   return current;
 }
 
-module.exports = { getState, toggleFeature, updateAISettings, updateAutoModSettings, updateModLogSettings };
+function setState(guildId, data) {
+  state.set(guildId, data);
+}
+
+module.exports = { getState, setState, toggleFeature, updateAISettings, updateAutoModSettings, updateModLogSettings };

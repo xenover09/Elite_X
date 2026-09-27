@@ -26,6 +26,7 @@ function getGuildReactionRoles(guildId) {
 function addReactionRole(guildId, messageId, channelId, pairs) {
   const guildRoles = getGuildReactionRoles(guildId);
   guildRoles.set(messageId, { channelId, pairs });
+  require('./persistentStore').saveGuildState(guildId);
 }
 
 /**
@@ -36,7 +37,9 @@ function addReactionRole(guildId, messageId, channelId, pairs) {
  */
 function removeReactionRole(guildId, messageId) {
   const guildRoles = getGuildReactionRoles(guildId);
-  return guildRoles.delete(messageId);
+  const result = guildRoles.delete(messageId);
+  require('./persistentStore').saveGuildState(guildId);
+  return result;
 }
 
 /**
@@ -50,8 +53,18 @@ function getReactionRole(guildId, messageId) {
   return guildRoles.get(messageId);
 }
 
+/**
+ * Set all reaction roles for a guild.
+ * @param {string} guildId 
+ * @param {Map<string, { channelId: string, pairs: Array<{emoji: string, roleId: string}> }>} mapping 
+ */
+function setGuildReactionRoles(guildId, mapping) {
+  state.set(guildId, mapping);
+}
+
 module.exports = {
   getGuildReactionRoles,
+  setGuildReactionRoles,
   addReactionRole,
   removeReactionRole,
   getReactionRole
