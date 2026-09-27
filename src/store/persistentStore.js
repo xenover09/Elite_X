@@ -118,5 +118,6 @@ async function saveBlacklistData(list) {
 module.exports = {
   loadAllData,
   saveGuildState,
-  saveBlacklistData
+  saveBlacklistData,
+  getRedisClient: initRedis
 };

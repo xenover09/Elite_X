@@ -119,12 +119,45 @@ function startDashboard(client) {
   });
 
   // Health check
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', async (req, res) => {
+    const uptime = process.uptime();
+    const pkg = require('../../package.json');
+    const version = pkg.version;
+
+    const discord = {
+      connected: client.isReady(),
+      guilds: client.guilds?.cache?.size || 0,
+      pingMs: client.ws?.ping || -1
+    };
+
+    const redisStatus = {
+      configured: false,
+      reachable: false
+    };
+
+    const { getRedisClient } = require('../store/persistentStore');
+    const r = getRedisClient();
+    if (r) {
+      redisStatus.configured = true;
+      try {
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000));
+        await Promise.race([r.ping(), timeout]);
+        redisStatus.reachable = true;
+      } catch (e) {
+        redisStatus.reachable = false;
+      }
+    }
+
     res.json({ 
       status: 'online', 
       bot: client.user?.tag || 'connecting',
       avatar: client.user?.displayAvatarURL() || null,
-      clientId: client.user?.id || process.env.CLIENT_ID || null
+      clientId: client.user?.id || process.env.CLIENT_ID || null,
+      uptime: Math.floor(uptime),
+      discord,
+      redis: redisStatus,
+      version,
+      checkedAt: new Date().toISOString()
     });
   });
 
