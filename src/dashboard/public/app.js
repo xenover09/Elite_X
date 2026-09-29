@@ -922,7 +922,7 @@
         formData.append('image', imageFile);
       }
 
-      await api('/api/panel/send', {
+      await api(`/api/panel/send?guildId=${currentGuildId}&channelId=${channelId}`, {
         method: 'POST',
         body: formData
       });
